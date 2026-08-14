@@ -2,7 +2,7 @@
 # (site/) and is consumed by Pages rather than served as an asset.
 #
 # Why this file exists: there is no build step here, so no content hashing.
-# hub.js and style.css used to be referenced as `?v=N` on all six pages, with a
+# hub.js and style.css used to be referenced as `?v=N` on every page, with a
 # note telling whoever edited them to bump N. Someone eventually didn't, and a
 # cached hub.js silently disabled every agent button on the site — the page
 # looked fine, the buttons just did nothing.

@@ -21,11 +21,20 @@
      file still runs — a hub with no header beats a hub with no lightbox, no
      folds and no agent buttons. */
   const CONFIG = globalThis.HUB_CONFIG || {};
-  const nav = Array.isArray(CONFIG.nav) ? CONFIG.nav : [];
+  const allNav = Array.isArray(CONFIG.nav) ? CONFIG.nav : [];
+  const featureEnabled = (feature) => {
+    if (!feature) return true;
+    if (feature === "activityLog") {
+      const owner = CONFIG.activityLog?.owner;
+      return CONFIG.activityLog?.enabled === true && typeof owner === "string" && Boolean(owner.trim());
+    }
+    return false;
+  };
+  const nav = allNav.filter((item) => featureEnabled(item.feature));
 
   // "/", "/index.html" and "/files.html" all have to resolve to a nav entry.
   const file = location.pathname.split("/").pop() || "index.html";
-  const here = nav.find((n) => n.href === file) || nav[0];
+  const here = allNav.find((n) => n.href === file) || nav[0];
 
   if (nav.length) {
     document.title = here.title || `${here.label} — ${CONFIG.siteName || ""}`.replace(/ — $/, "");

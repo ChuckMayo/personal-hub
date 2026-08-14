@@ -81,7 +81,7 @@ look like your team.**
 ## Pull requests
 
 - One change per PR. A PR that also reformats is two PRs.
-- Say what you verified, and how. "Loaded all six pages, no console errors" is
+- Say what you verified, and how. "Loaded every page, no console errors" is
   worth more than "should work" — this project has no test suite, so the PR body
   is the evidence.
 - Screenshots for anything visual, in both light and dark. The palette is

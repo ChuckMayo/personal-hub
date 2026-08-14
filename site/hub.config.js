@@ -64,6 +64,13 @@ globalThis.HUB_CONFIG = {
       title: "Files & builds — Atlas",
       footer: "Files live in Cloudflare R2 · gated by Access",
     },
+    {
+      href: "activity.html",
+      label: "Activity",
+      title: "Team activity — Atlas",
+      footer: "Concise pointers to the real project records · accountable to a human owner",
+      feature: "activityLog",
+    },
     { href: "setup.html", label: "Setup", title: "Setup — Get your agent running" },
     { href: "guide.html", label: "Guide", title: "Guide — How we work with agents" },
     { href: "resources.html", label: "Resources", title: "Resources — Working with agents 101" },
@@ -84,6 +91,20 @@ globalThis.HUB_CONFIG = {
      what keeps Setup a product page rather than a per-team copy. */
   projectName: "Atlas",
   repoDirName: "atlas",
+
+  /* Optional shared activity log. It is absent from navigation until a human
+     explicitly enables it AND names the human who owns what gets published.
+     Agents must never turn this on for themselves. Once enabled, an agent may
+     add a concise entry with scripts/add-activity.mjs after the owner asks.
+
+     Activity data is committed to the hub repo. Use a private repo for internal
+     updates, and never put reasoning traces, messages, credentials, personal
+     data, raw customer data, raw logs or secrets in the log. */
+  activityLog: {
+    enabled: false,
+    owner: "",
+    dataFile: "activity.json",
+  },
 
   /* Extra agent launchers, beyond the built-in Claude Code / Claude desktop /
      Claude in VS Code / Codex / Copy prompt. Use this for a tool specific to

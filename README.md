@@ -25,6 +25,7 @@ That is usually five SaaS subscriptions and a Slack channel. This is one repo.
 | **Dashboard** | Live GitHub + board stats, epic timeline, KPIs, screenshot strip, and a queue of agent-ready tickets with one-click launch into Claude Code, Codex or your clipboard |
 | **Meetings** | Summary, decisions, action items with contextual buttons, publishable clips, and a searchable transcript with visible redaction markers |
 | **Files & builds** | Drag-and-drop upload to R2, chunked so a multi-gigabyte build works, per-platform "download latest", screenshot gallery |
+| **Activity (optional)** | Human-owned, agent-friendly workstream updates that stay concise and point to the true project records; absent until a human opts in |
 | **Setup / Guide / Resources** | Onboarding pages your team owns. Setup is a real agent-install walkthrough; the other two ship as examples to replace |
 | **MCP server** | The hub itself is an MCP server, so an agent in your repo can read meetings, action items and the ticket queue instead of a human relaying them |
 
@@ -57,6 +58,15 @@ Newest build per platform, an archive, and a drop zone that chunks large uploads
 into R2 — a multi-gigabyte build is fine.
 
 ![Files and builds](docs/screenshots/files.png)
+
+### Activity, after opt-in
+
+A human-owned workstream trail with concise updates and links back to the real
+project records. The active view and navigation item are absent until enabled.
+
+![Activity](docs/screenshots/activity.png)
+
+![Activity in light mode](docs/screenshots/activity-light.png)
 
 ### Setup
 
@@ -113,7 +123,8 @@ Then push to `main`. The workflow refreshes data and deploys.
 Two things:
 
 - **`site/hub.config.js`** — one commented file. Org, site name, nav, repo,
-  tracker, phase plan, dashboard links, and the agent prompt templates.
+  tracker, phase plan, dashboard links, agent prompt templates, and the optional
+  activity-log opt-in.
 - **`site/brand/`** — `mark.png` plus `mark-32.png` and `mark-64.png`.
 
 That is the whole of "who this hub belongs to". Everything else is generic.
@@ -190,6 +201,7 @@ site/                 what deploys — plain files, no build
   hub.js              shell, agent launcher, lightbox, folds
   _headers            cache rules
   data.json           written by scripts/fetch-data.mjs
+  activity.json       optional, human-owned workstream pointers
   meetings/           one JSON per meeting + transcripts
 functions/            Pages Functions — AT THE PROJECT ROOT, see below
   api/                R2 file store: list, upload, chunked multipart, download
@@ -197,6 +209,7 @@ functions/            Pages Functions — AT THE PROJECT ROOT, see below
 scripts/
   init.mjs            first-run setup
   fetch-data.mjs      refresh data.json from GitHub + the tracker
+  add-activity.mjs    append a validated update after human opt-in
   sync-proof-shots.sh mirror screenshots out of PR bodies
 ```
 
@@ -244,6 +257,54 @@ claude mcp add --transport http my-hub https://my-hub.pages.dev/mcp \
 Uploads made through a service token are recorded against the token, not a
 person.
 
+## Optional shared activity log
+
+The Activity page is a small, centralized status trail for a team that wants
+one. It is deliberately **off by default**: no navigation item appears and the
+authoring command refuses to write until a human changes both settings in
+`site/hub.config.js`:
+
+```js
+activityLog: {
+  enabled: true,
+  owner: "Jordan Lee",
+  dataFile: "activity.json",
+},
+```
+
+`owner` is the human accountable for what appears in the log. Agents never
+enable the feature or choose the owner. After the owner explicitly asks for an
+update, an agent can use the repository-owned command:
+
+```bash
+node scripts/add-activity.mjs \
+  --kind=milestone \
+  --workstream="Save flow" \
+  --summary="Restart recovery now preserves the selected slot." \
+  --link="Pull request|https://github.com/acme/widget/pull/42"
+```
+
+Kinds are `outcome`, `milestone`, `decision`, `blocker`, and `next-step`. The
+command requires a single-line summary of at most 280 characters and at least
+one labelled HTTPS link. It records the configured human owner, prepends the
+entry to `site/activity.json`, and asks the agent to review the diff. The detail
+stays in the linked PR, ticket, decision record, release, or other canonical
+project system.
+
+Put the rule in front of agents by keeping this template's `AGENTS.md` in your
+hub fork. It requires explicit human opt-in and a direct request before every
+post. Humans remain accountable for decisions and external actions.
+
+**This is not a reasoning or monitoring feed.** Never post private reasoning
+traces, messages, credentials, personal data, raw customer data, raw logs, or
+secrets. The owner label is the minimum approved attribution, not permission to
+include other personal information.
+
+**Access protects the deployed site, not the source repository.** Activity data
+is committed as a plain file. If updates are internal, keep the hub repository
+private and review the diff before pushing; history in a public repository is
+public even when the Pages site is behind Cloudflare Access.
+
 ## Publishing a meeting
 
 1. Transcribe locally — audio never leaves the machine:
@@ -282,13 +343,13 @@ only in files upstream does not compete for:
 |---|---|
 | `site/hub.config.js` | ships an example version |
 | `site/brand/` | ships a placeholder mark |
-| `site/data.json`, `site/meetings/`, `site/img/proof/` | ships example data |
+| `site/data.json`, `site/activity.json`, `site/meetings/`, `site/img/proof/` | ships example data |
 | `wrangler.toml` | ships placeholder names |
 | `guide.html`, `resources.html` | ships example prose |
 
 Everything else — `hub.js`, `style.css`, `index.html`, `meetings.html`,
-`files.html`, `setup.html`, `functions/`, `scripts/` — should be **byte-identical
-to upstream**, and those merges fast-forward cleanly.
+`files.html`, `activity.html`, `setup.html`, `functions/`, `scripts/` — should
+be **byte-identical to upstream**, and those merges fast-forward cleanly.
 
 ### The conflict is the feature
 
