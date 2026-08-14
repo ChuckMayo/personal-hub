@@ -15,3 +15,4 @@ site/video/
 
 # local editor / agent scratch
 .claude/launch.json
+.playwright-cli/

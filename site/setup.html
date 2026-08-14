@@ -24,6 +24,7 @@
   <a href="#s-install">Install</a>
   <a href="#s-first">First session</a>
   <a href="#s-paste">Stop pasting</a>
+  <a href="#s-activity">Shared updates</a>
   <a href="#s-next">What's next</a>
 </nav>
 
@@ -311,6 +312,10 @@ codex doctor      <span class="c"># checks install, auth, config, and runtime he
   <li><strong>The repo already briefs it.</strong> <code>AGENTS.md</code> loads automatically at the start of every session: the stack, the conventions, the gates, the ticket protocol. You never re-explain the project.</li>
   <li><strong>Sessions come back.</strong> <code>claude --continue</code> picks up where you left off; <code>claude --resume</code> (or <code>/resume</code> inside a session) lets you choose an older one. In the desktop app and IDE extension, your conversations are listed in the sidebar. No re-establishing context by re-pasting.</li>
 </ol>
+
+<h2 id="s-activity">Shared updates are opt-in</h2>
+<p>This hub can expose a central Activity page and let an agent add concise workstream updates. It only appears after a human enables it in <code>site/hub.config.js</code>, names the human owner, and asks for an update. An agent cannot opt itself in.</p>
+<div class="callout callout--water"><strong>It is a pointer, not a transcript.</strong> Updates cover outcomes, milestones, decisions, blockers, or next steps and link to the real project record. Never put private reasoning, messages, credentials, personal or customer data, raw logs, or secrets there. Humans remain accountable for decisions and external actions.</div>
 
 <h2 id="s-next">What's next</h2>
 <ol class="steps">

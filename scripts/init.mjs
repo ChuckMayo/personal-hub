@@ -280,6 +280,7 @@ ${bold("  5. Still the example's — init cannot guess these")}
     ${yellow("links")} ......... the Links fold on the dashboard
     ${yellow("prompts")} ....... the prompt buttons — these encode YOUR harness and gates,
                     and are worth rewriting rather than tweaking
+    ${yellow("activityLog")} ... optional; a human must enable it and name its owner
     ${yellow("footer")} ........ the line at the bottom of every page
 
 ${bold("  6. Then")}

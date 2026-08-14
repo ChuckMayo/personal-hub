@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team activity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site" data-hub-shell></header>
+
+<main>
+  <div id="activity-off">
+    <p class="meta">Optional capability · no activity data loaded</p>
+    <h1>The shared activity log is off</h1>
+    <p class="lead">A human must explicitly enable this log and accept ownership before an agent may publish anything here.</p>
+    <div class="callout callout--amber"><strong>Agents cannot opt themselves in.</strong> Set <code>activityLog.enabled</code> to <code>true</code> and name a human <code>owner</code> in <code>site/hub.config.js</code>. Until both are present, Activity stays out of the navigation and the authoring command refuses to write.</div>
+  </div>
+
+  <div id="activity-on" hidden>
+    <p class="meta" id="activity-meta"></p>
+    <h1>What moved across the team</h1>
+    <p class="lead">A concise shared trail of outcomes, milestones, decisions, blockers and next steps. Every update points back to the project record where the real detail lives.</p>
+    <div class="callout callout--water"><strong>A pointer, not a surveillance feed.</strong> These summaries contain no private reasoning, messages, credentials, personal or customer data, raw logs, or secrets. Agents can draft updates; the named human remains accountable for decisions and external actions.</div>
+    <div class="activity-list" id="activity-list" aria-live="polite"></div>
+  </div>
+</main>
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+<script>
+const CONFIG = globalThis.HUB_CONFIG || {};
+const settings = CONFIG.activityLog || {};
+const owner = typeof settings.owner === "string" ? settings.owner.trim() : "";
+const active = settings.enabled === true && Boolean(owner);
+const esc = (text) => String(text).replace(/[&<>\"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char]));
+const kinds = {
+  outcome: "Outcome",
+  milestone: "Milestone",
+  decision: "Decision",
+  blocker: "Blocker",
+  "next-step": "Next step",
+};
+
+if (active) {
+  document.getElementById("activity-off").hidden = true;
+  document.getElementById("activity-on").hidden = false;
+  document.getElementById("activity-meta").textContent = `Opted in · human owner: ${owner}`;
+
+  const target = document.getElementById("activity-list");
+  fetch(settings.dataFile || "activity.json", { cache: "no-cache" })
+    .then((response) => {
+      if (!response.ok) throw new Error(`activity data returned ${response.status}`);
+      return response.json();
+    })
+    .then((data) => {
+      const entries = Array.isArray(data.entries) ? data.entries : [];
+      if (!entries.length) {
+        target.innerHTML = '<p class="empty">No updates yet. The owner can ask an agent to add the first one with <code>node scripts/add-activity.mjs --help</code>.</p>';
+        return;
+      }
+      target.innerHTML = entries.map((entry) => {
+        const date = new Date(entry.timestamp);
+        const when = Number.isNaN(date.valueOf())
+          ? "Date unavailable"
+          : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
+        const links = (Array.isArray(entry.links) ? entry.links : [])
+          .filter((link) => /^https:\/\//i.test(link?.href || ""))
+          .map((link) => `<a href="${esc(link.href)}">${esc(link.label || "Project record")}</a>`)
+          .join("");
+        return `<article class="activity activity--${esc(entry.kind || "outcome")}">
+          <div class="activity__rail" aria-hidden="true"></div>
+          <div class="activity__body">
+            <div class="activity__meta"><span class="activity__kind">${esc(kinds[entry.kind] || "Update")}</span><time datetime="${esc(entry.timestamp || "")}">${esc(when)}</time></div>
+            <h2>${esc(entry.workstream || "Workstream")}</h2>
+            <p>${esc(entry.summary || "")}</p>
+            <div class="activity__foot"><span>Owned by ${esc(entry.owner || owner)}</span><span class="activity__links">${links}</span></div>
+          </div>
+        </article>`;
+      }).join("");
+    })
+    .catch((error) => {
+      target.innerHTML = `<div class="callout callout--amber"><strong>Activity could not be loaded.</strong> ${esc(error.message)}</div>`;
+    });
+}
+</script>
+</body>
+</html>

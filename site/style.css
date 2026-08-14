@@ -718,6 +718,60 @@ pre.term {
 }
 pre.term .c { color: var(--text-dim); }
 
+/* ---- optional shared activity log --------------------------------------- */
+.activity-list { display: grid; gap: 14px; margin-top: 26px; }
+.activity {
+  --tone: var(--accent);
+  display: grid;
+  grid-template-columns: 5px minmax(0, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.activity--outcome, .activity--milestone { --tone: var(--green); }
+.activity--decision { --tone: var(--water); }
+.activity--blocker { --tone: var(--amber); }
+.activity--next-step { --tone: var(--accent); }
+.activity__rail { background: var(--tone); }
+.activity__body { padding: 18px 20px; min-width: 0; }
+.activity__meta, .activity__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.activity__kind {
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 12%, transparent);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.activity h2 { margin: 10px 0 5px; font-size: 18px; }
+.activity h2::before { display: none; }
+.activity p { color: var(--text-dim); max-width: 74ch; }
+.activity__foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.activity__links { display: flex; flex-wrap: wrap; gap: 6px; }
+.activity__links a {
+  color: var(--tone);
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+  border-radius: 6px;
+  padding: 3px 8px;
+  text-decoration: none;
+}
+.activity__links a:hover { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 560px) {
+  .activity__body { padding: 16px; }
+  .activity__meta, .activity__foot { align-items: flex-start; flex-direction: column; }
+}
+
 
 /* ---- links --------------------------------------------------------------- */
 /* Colour alone was the only cue that something was a link, which fails
@@ -972,10 +1026,10 @@ body::before {
 }
 
 /* ---- card lift ----------------------------------------------------------- */
-.epic, .kpi, .fold, .shot, .build, .clip, .phase, .act, .tk {
+.epic, .kpi, .fold, .shot, .build, .clip, .phase, .act, .tk, .activity {
   transition: border-color .2s ease, box-shadow .3s ease, transform .3s ease;
 }
-.epic:hover, .kpi:hover, .shot:hover, .build:hover, .clip:hover, .tk:hover {
+.epic:hover, .kpi:hover, .shot:hover, .build:hover, .clip:hover, .tk:hover, .activity:hover {
   border-color: color-mix(in srgb, var(--tone, var(--accent)) 45%, var(--border-bright));
   box-shadow: 0 10px 30px -14px color-mix(in srgb, var(--tone, var(--accent)) 60%, transparent);
   transform: translateY(-2px);
@@ -984,9 +1038,9 @@ body::before {
 
 @media (prefers-reduced-motion: reduce) {
   body::before { animation: none; }
-  .epic, .kpi, .fold, .shot, .build, .clip, .phase, .act, .tk,
+  .epic, .kpi, .fold, .shot, .build, .clip, .phase, .act, .tk, .activity,
   .kpi::after, .shot img { transition: none; }
-  .epic:hover, .kpi:hover, .shot:hover, .build:hover, .clip:hover, .tk:hover { transform: none; }
+  .epic:hover, .kpi:hover, .shot:hover, .build:hover, .clip:hover, .tk:hover, .activity:hover { transform: none; }
   .shot:hover img { transform: none; }
 }
 
