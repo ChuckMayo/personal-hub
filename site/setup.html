@@ -281,9 +281,9 @@ codex</pre>
 
 <p>Now ask it something <strong>read-only</strong>. Real questions worth trying:</p>
 <ul>
-  <li>&ldquo;Explain how networked player movement works in this repo. Which files own it?&rdquo;</li>
+  <li>&ldquo;Explain how the main entry point works in this repo. Which files own it?&rdquo;</li>
   <li>&ldquo;What do our checks actually run before a PR can merge?&rdquo;</li>
-  <li>&ldquo;Where do the Act 1 slice scenes live, and which ones are sandboxes?&rdquo;</li>
+  <li>&ldquo;Which parts of this codebase are safe to change, and which are load-bearing?&rdquo;</li>
 </ul>
 <p>Watch what it does <em>before</em> it answers: it lists directories, opens files, greps for symbols. That's the whole thing. It went and looked.</p>
 
@@ -307,7 +307,7 @@ codex doctor      <span class="c"># checks install, auth, config, and runtime he
 <h2 id="s-paste">The three things that replace copy-pasting</h2>
 <p>If you take nothing else from this page, take these.</p>
 <ol class="steps">
-  <li><strong>It reads the files itself.</strong> Never paste a file, a stack trace, or a chunk of a scene. Name it — &ldquo;look at <code>Assets/Scripts/Net/NetworkedPlayer.cs</code>&rdquo; — and it opens it. Pasting actively makes the answer <em>worse</em>, because it only sees the fragment you chose instead of the code around it.</li>
+  <li><strong>It reads the files itself.</strong> Never paste a file, a stack trace, or a chunk of config. Name it — &ldquo;look at <code>src/server/session.ts</code>&rdquo; — and it opens it. Pasting actively makes the answer <em>worse</em>, because it only sees the fragment you chose instead of the code around it.</li>
   <li><strong>The repo already briefs it.</strong> <code>AGENTS.md</code> loads automatically at the start of every session: the stack, the conventions, the gates, the ticket protocol. You never re-explain the project.</li>
   <li><strong>Sessions come back.</strong> <code>claude --continue</code> picks up where you left off; <code>claude --resume</code> (or <code>/resume</code> inside a session) lets you choose an older one. In the desktop app and IDE extension, your conversations are listed in the sidebar. No re-establishing context by re-pasting.</li>
 </ol>

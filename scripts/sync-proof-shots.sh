@@ -99,7 +99,7 @@ fi
 
 {
   printf '{\n'
-  printf '  "note": "Mirrored from PR bodies in the private game repo. Regenerate with scripts/sync-proof-shots.sh.",\n'
+  printf '  "note": "Mirrored from PR bodies. Regenerate with scripts/sync-proof-shots.sh.",\n'
   printf '  "syncedAt": "%s",\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf '  "shots": [\n'
   printf '%s' "$entries" | sed '$ s/,$//'

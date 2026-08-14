@@ -31,6 +31,45 @@ That is usually five SaaS subscriptions and a Slack channel. This is one repo.
 Everything sits behind Cloudflare Access, so it is private without you running
 an auth system.
 
+## What it looks like
+
+Every screenshot below is a **fresh clone with nothing configured** — the
+fictional example team this repo ships with. That is what you get before you
+have edited anything.
+
+### Dashboard
+
+Live PRs and commits, epics rolled up from their child tickets, and a queue of
+agent-ready tickets with a prompt button each.
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Meetings
+
+Summary, decisions, action items with contextual buttons, clips, and a
+searchable transcript with visible redaction markers.
+
+![Meetings](docs/screenshots/meetings.png)
+
+### Files & builds
+
+Newest build per platform, an archive, and a drop zone that chunks large uploads
+into R2 — a multi-gigabyte build is fine.
+
+![Files and builds](docs/screenshots/files.png)
+
+### Setup
+
+An onboarding page that walks a teammate from nothing to a working agent.
+
+![Setup](docs/screenshots/setup.png)
+
+### Light and dark
+
+The palette is defined twice and follows the reader's system setting.
+
+![Dashboard in light mode](docs/screenshots/dashboard-light.png)
+
 ## Cost
 
 Cloudflare Pages, Functions and R2 all have free tiers this fits inside
