@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meetings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site" data-hub-shell></header>
+<p class="meta" id="meta">loading…</p>
+<nav class="jumps">
+  <a href="#s-summary">Summary</a>
+  <a href="#s-actions">Action items</a>
+  <a href="#s-decisions">Decisions</a>
+  <a href="#s-clips">Clips</a>
+  <a href="#s-transcript">Transcript</a>
+</nav>
+
+<h1 id="title">Meetings</h1>
+<p class="lead" id="lead">Recordings, summaries, action items, and full searchable transcripts.</p>
+
+<div class="tabs" id="picker"></div>
+
+<div id="body"></div>
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+
+<script>
+const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const $ = (id) => document.getElementById(id);
+
+const hms = (s) => {
+  s = Math.max(0, Math.floor(s || 0));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}`
+           : `${m}:${String(x).padStart(2, "0")}`;
+};
+const dlKey = (k, inline) => `/api/dl?key=${encodeURIComponent(k)}${inline ? "&inline=1" : ""}`;
+
+// A meeting date is a calendar day, not an instant. Feeding "2026-08-12" to the
+// Date constructor lands on UTC midnight, which renders as the day before for
+// anyone west of Greenwich — so pull the parts out and build a local date.
+const parseDay = (s) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || ""));
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(s);
+};
+
+let meeting = null, segments = [], hasVideo = false;
+
+/* Buttons that need JS carry an index into this instead of stuffing a whole
+   prompt into a data- attribute. Reset on every render. */
+let cardActions = [];
+
+/* Timestamps are only worth clicking when there is a player to seek. When the
+   recording is withheld they render as plain labels instead of links that
+   would silently do nothing. */
+const at = (t, label) => hasVideo
+  ? `<a href="#" data-seek="${t}">${label}</a>`
+  : `<span class="ts">${label}</span>`;
+
+/* ---- render -------------------------------------------------------------- */
+function renderMeeting(m) {
+  meeting = m;
+  const d = parseDay(m.date);
+  $("title").textContent = m.title;
+  $("lead").textContent = m.blurb || "";
+  $("meta").textContent =
+    `${d.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}` +
+    ` · ${hms(m.durationSec)} · ${m.attendees?.length ? m.attendees.join(", ") : "attendees not recorded"}`;
+
+  const s = m.summary || {};
+  const clips = m.clips || [];
+  const internal = clips.filter((c) => c.audience !== "external");
+  const external = clips.filter((c) => c.audience === "external");
+  hasVideo = !!m.videoKey;
+  cardActions = [];
+
+  $("body").innerHTML = `
+    ${hasVideo ? `<video class="player" id="player" controls preload="metadata" src="${dlKey(m.videoKey, true)}"></video>
+      <p class="note">Streams from R2 with range requests, so scrubbing works. Nothing this large ever touches the git repo.</p>`
+      : `<div class="note">${esc(m.recordingPolicy || "The full recording is not published — only the clips below.")}</div>`}
+
+    <h2 id="s-summary">Summary</h2>
+    ${s.headline ? `<div class="callout"><strong>${esc(s.headline)}</strong></div>` : ""}
+    ${(s.paragraphs || []).map((p) => `<p class="lead mt-2">${esc(p)}</p>`).join("")}
+
+    ${(m.cautions || []).length ? `<div class="callout callout--water mt-3">
+      <strong>Before any of this leaves the team</strong>
+      <ul class="cautions">${m.cautions.map((c) => `<li class="cautions-item">${esc(c)}</li>`).join("")}</ul>
+    </div>` : ""}
+    ${m.provenance?.note ? `<div class="note">${esc(m.provenance.note)}</div>` : ""}
+
+    ${(m.topics || []).length ? `
+      <h2>What we covered</h2>
+      <div class="card"><ul class="rows">
+        ${m.topics.map((t) => `<li>
+          <span class="id">${at(t.start, hms(t.start))}</span>
+          <span class="t"><strong>${esc(t.title)}</strong>${t.summary ? ` — ${esc(t.summary)}` : ""}</span>
+        </li>`).join("")}
+      </ul></div>` : ""}
+
+    <h2 id="s-actions">Action items</h2>
+    ${(m.actionItems || []).length ? `<ul class="actions">
+      ${m.actionItems.map((a) => `<li class="act${a.done ? " act--done" : ""}">
+        <div class="act__top"><span class="act__who">${esc(a.who || "unassigned")}</span>
+          ${a.due ? `<span class="chip chip--todo">due ${esc(a.due)}</span>` : ""}
+          ${a.ticket ? `<span class="chip chip--progress">${esc(a.ticket)}</span>` : ""}</div>
+        <div class="act__text">${esc(a.what)}</div>
+        <div class="act__meta">${a.at != null ? at(a.at, "heard at " + hms(a.at)) : ""}${a.note ? ` · ${esc(a.note)}` : ""}</div>
+        ${(a.actions || []).length ? `<div class="act__do">${a.actions.map((x) => actionButton(x, a)).join("")}</div>` : ""}
+      </li>`).join("")}
+    </ul>` : '<p class="lead">No action items captured for this meeting.</p>'}
+
+    ${(m.decisions || []).length ? `
+      <h2 id="s-decisions">Decisions</h2>
+      <div class="card"><ul class="rows">
+        ${m.decisions.map((x) => `<li>
+          <span class="id">${x.at != null ? at(x.at, hms(x.at)) : "—"}</span>
+          <span class="t">${esc(x.text)}</span></li>`).join("")}
+      </ul></div>` : ""}
+
+    <h2 id="s-clips">Clips</h2>
+    <p class="lead">Moments worth cutting out of the recording. <strong>Internal</strong> are for the team;
+      <strong>external</strong> are the ones safe to publish as-is.</p>
+    ${clips.length ? `
+      ${external.length ? `<h3 class="mt-3">Publishable</h3><div class="clips">${external.map(clipCard).join("")}</div>` : ""}
+      ${internal.length ? `<h3 class="mt-3">Internal</h3><div class="clips">${internal.map(clipCard).join("")}</div>` : ""}`
+      : '<p class="lead">No clips marked yet.</p>'}
+
+    <h2 id="s-transcript">Transcript</h2>
+    <div class="toolbar">
+      <input class="search" id="q" placeholder="search the transcript…">
+      <span id="hits" class="meta m-0"></span>
+      <span class="toolbar__spacer"></span>
+      ${(m.downloads || []).map((f) => `<a class="btn btn--sm" data-icon="↓" href="${esc(f.href)}" download>${esc(f.label)}</a>`).join("")}
+    </div>
+    <div class="tx" id="tx"><p class="empty">loading transcript…</p></div>`;
+
+  loadTranscript(m);
+}
+
+/* One button on an action-item card. `kind` is the extension point: a new kind
+   is a new branch here and a new entry in the meeting JSON, with no change to
+   the surrounding template.
+
+   `agent` buttons render only once a launcher has registered itself as
+   window.kfLaunchAgent. Until then they are omitted rather than shown
+   disabled — a button that visibly does nothing is worse than no button. */
+/* Clipboard write needs a secure context and a real user gesture. Both hold on
+   the deployed site, but fall back to the old selection trick rather than
+   dead-ending if either is missing. */
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(() => legacyCopy(text));
+  }
+  return legacyCopy(text);
+}
+
+function legacyCopy(text) {
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch { ok = false; }
+    ta.remove();
+    ok ? resolve() : reject(new Error("copy unavailable"));
+  });
+}
+
+function actionButton(act, item) {
+  const label = esc(act.label || "open");
+  if (act.kind === "link" || act.kind === "page") {
+    const icon = act.kind === "page" ? ' data-icon="→"' : "";
+    return `<a class="btn btn--sm"${icon} href="${esc(act.href)}">${label}</a>`;
+  }
+  if (act.kind === "agent" && typeof window.kfLaunchAgent !== "function") return "";
+  if (act.kind === "copy" || act.kind === "agent") {
+    const id = cardActions.push({ act, item }) - 1;
+    const cls = act.kind === "agent" ? "btn btn--sm btn--primary" : "btn btn--sm";
+    const glyph = act.kind === "agent" ? "▸" : "⧉";
+    return `<button class="${cls}" data-icon="${glyph}" data-card-action="${id}">${label}</button>`;
+  }
+  return "";
+}
+
+function clipCard(c) {
+  const dur = Math.max(0, (c.end || 0) - (c.start || 0));
+  return `<div class="clip">
+    <div class="clip__tag">${esc(c.audience === "external" ? "external" : "internal")} · ${hms(dur)}</div>
+    <div class="clip__name">${esc(c.title)}</div>
+    ${c.quote ? `<div class="clip__quote">“${esc(c.quote)}”</div>` : ""}
+    ${c.why ? `<div class="clip__why">${esc(c.why)}</div>` : ""}
+    <div class="clip__meta">${hms(c.start)} → ${hms(c.end)}</div>
+    <div class="toolbar btn-row">
+      ${hasVideo ? `<button class="btn btn--sm" data-seek="${c.start}">play here</button>` : ""}
+      ${c.key ? `<a class="btn btn--sm btn--primary" data-icon="↓" href="${dlKey(c.key)}">download</a>` : ""}
+    </div>
+  </div>`;
+}
+
+/* ---- transcript ---------------------------------------------------------- */
+async function loadTranscript(m) {
+  if (!m.transcript) { $("tx").innerHTML = '<p class="empty">No transcript for this meeting.</p>'; return; }
+  try {
+    const r = await fetch(m.transcript, { cache: "no-cache" });
+    if (!r.ok) throw new Error(String(r.status));
+    const d = await r.json();
+    segments = d.segments || [];
+    drawTranscript("");
+  } catch {
+    $("tx").innerHTML = '<p class="empty">Transcript file missing.</p>';
+  }
+}
+
+function drawTranscript(q) {
+  const needle = q.trim().toLowerCase();
+  const rows = [];
+  let hits = 0;
+  for (const s of segments) {
+    const text = s.t;
+    const isHit = needle && text.toLowerCase().includes(needle);
+    if (needle && !isHit) continue;
+    if (isHit) hits++;
+    const shown = isHit ? highlight(text, needle) : esc(text);
+    rows.push(`<div class="seg${isHit ? " is-hit" : ""}${s.redacted ? " seg--cut" : ""}">
+      <span class="seg__t">${at(s.s, hms(s.s))}</span>
+      <div class="seg__x">${shown}</div></div>`);
+  }
+  $("tx").innerHTML = rows.length ? rows.join("") : '<p class="empty">no matches</p>';
+  $("hits").textContent = needle
+    ? `${hits} matching line${hits === 1 ? "" : "s"}`
+    : `${segments.length} lines`;
+}
+
+function highlight(text, needle) {
+  const out = [];
+  let i = 0;
+  const low = text.toLowerCase();
+  for (;;) {
+    const at = low.indexOf(needle, i);
+    if (at < 0) { out.push(esc(text.slice(i))); break; }
+    out.push(esc(text.slice(i, at)), "<mark>", esc(text.slice(at, at + needle.length)), "</mark>");
+    i = at + needle.length;
+  }
+  return out.join("");
+}
+
+/* ---- wiring -------------------------------------------------------------- */
+document.addEventListener("click", (e) => {
+  const card = e.target.closest("[data-card-action]");
+  if (card) {
+    e.preventDefault();
+    const entry = cardActions[Number(card.dataset.cardAction)];
+    if (!entry) return;
+    const { act, item } = entry;
+    if (act.kind === "copy") {
+      const text = [item.what, "", `Owner: ${item.who || "unassigned"}`,
+                    `From ${meeting.title}.`].join("\n");
+      const was = card.textContent;
+      copyText(text).then(
+        () => { card.textContent = "copied"; },
+        () => { card.textContent = "press Ctrl+C"; }
+      ).finally(() => setTimeout(() => { card.textContent = was; }, 1400));
+    } else if (act.kind === "agent") {
+      window.kfLaunchAgent({
+        prompt: act.prompt,
+        label: act.label,
+        source: `${meeting.id} · action item · ${item.who || "unassigned"}`,
+      });
+    }
+    return;
+  }
+
+  const seek = e.target.closest("[data-seek]");
+  if (!seek) return;
+  e.preventDefault();
+  const p = $("player");
+  if (!p) return;
+  p.currentTime = Number(seek.dataset.seek) || 0;
+  p.play().catch(() => {});
+  p.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "q") drawTranscript(e.target.value);
+});
+
+/* hub.js is deferred, so it runs after this script is parsed but before
+   DOMContentLoaded. A small or cached meeting JSON can resolve faster than
+   that — and actionButton() drops `agent` buttons when window.kfLaunchAgent
+   is not defined yet, so losing this race silently costs every launch button
+   on the page while everything else looks fine.
+
+   It is load-order dependent, which is what makes it nasty: a big transcript
+   hides it and a small one exposes it. Waiting removes the race rather than
+   narrowing it. */
+const hubReady = new Promise((resolve) => {
+  if (document.readyState !== "loading") resolve();
+  else document.addEventListener("DOMContentLoaded", resolve, { once: true });
+});
+
+fetch("meetings/index.json", { cache: "no-cache" })
+  .then((r) => { if (!r.ok) throw new Error("no index"); return r.json(); })
+  .then(async (idx) => {
+    const list = idx.meetings || [];
+    if (!list.length) throw new Error("empty");
+    await hubReady;
+    $("picker").innerHTML = list.map((m, i) =>
+      `<span class="btn btn--sm btn--pill${i === 0 ? " is-on" : ""}" data-file="${esc(m.file)}">${esc(m.label)}</span>`).join("");
+    document.querySelectorAll("#picker [data-file]").forEach((t) =>
+      t.addEventListener("click", async () => {
+        document.querySelectorAll("#picker [data-file]").forEach((x) => x.classList.remove("is-on"));
+        t.classList.add("is-on");
+        renderMeeting(await (await fetch(t.dataset.file, { cache: "no-cache" })).json());
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }));
+    renderMeeting(await (await fetch(list[0].file, { cache: "no-cache" })).json());
+  })
+  .catch(() => {
+    $("meta").textContent = "no meetings published yet";
+    $("body").innerHTML = '<div class="callout">Nothing here yet. Meetings are published as JSON under <code>site/meetings/</code> — see the README.</div>';
+  });
+</script>
+</body>
+</html>

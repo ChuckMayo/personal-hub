@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap guide">
+
+<header class="site" data-hub-shell></header>
+<p class="meta">Twenty minutes, once. Pick an agent, get an account, install it — then <a href="guide.html">the Guide</a> is how we work.</p>
+<nav class="jumps">
+  <a href="#s-pick">Pick an agent</a>
+  <a href="#s-account">Account</a>
+  <a href="#s-install">Install</a>
+  <a href="#s-first">First session</a>
+  <a href="#s-paste">Stop pasting</a>
+  <a href="#s-next">What's next</a>
+</nav>
+
+<h1>Get your agent running</h1>
+<p class="lead">The part that doesn't come across on a screen-share: <strong>this is not a chat window.</strong> It runs on your machine, in your checkout. It opens files, greps the codebase, runs your tests, and makes commits. You never paste code into it.</p>
+<p class="lead">Install before we pair. Don't try anything ambitious yet — your first real change is better done with someone next to you.</p>
+
+<h2 id="s-pick">Pick your agent</h2>
+<p>The first three are wired into this repo. Pick one and everything below follows it.</p>
+
+<div class="deck" id="deck">
+
+  <button class="starcard" type="button" data-agent="claude" aria-pressed="false" style="--tint:var(--accent); --tint-dim:var(--accent-dim);">
+    <span class="starcard__tier">Ships in this repo</span>
+    <span class="starcard__art">
+      <svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true" focusable="false"><path fill="currentColor" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+    </span>
+    <span class="starcard__name">Claude Code</span>
+    <span class="starcard__by">Anthropic</span>
+    <span class="starcard__line">Reads a committed <code>.mcp.json</code>, so any MCP servers your repo ships work the moment you open the folder.</span>
+    <span class="starcard__stats"><span>terminal</span><span>desktop</span><span>VS Code · JetBrains</span></span>
+  </button>
+
+  <button class="starcard" type="button" data-agent="codex" aria-pressed="false" style="--tint:var(--text); --tint-dim:var(--surface2);">
+    <span class="starcard__tier">One command to wire up</span>
+    <span class="starcard__art starcard__art--type" aria-hidden="true"><b>&gt;_</b>codex</span>
+    <span class="starcard__name">Codex</span>
+    <span class="starcard__by">OpenAI</span>
+    <span class="starcard__line">Reads <code>AGENTS.md</code> the same way. Ignores project-level MCP config, so repo MCP servers take one setup command.</span>
+    <span class="starcard__stats"><span>terminal</span><span>desktop</span></span>
+  </button>
+
+  <button class="starcard" type="button" data-agent="cursor" aria-pressed="false" style="--tint:var(--water); --tint-dim:var(--water-dim);">
+    <span class="starcard__tier">Ships in this repo</span>
+    <span class="starcard__art">
+      <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true" focusable="false"><path fill="currentColor" d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg>
+    </span>
+    <span class="starcard__name">Cursor</span>
+    <span class="starcard__by">Anysphere</span>
+    <span class="starcard__line"><code>.cursor/mcp.json</code> is committed too. The one that feels most like an editor you already know.</span>
+    <span class="starcard__stats"><span>editor</span></span>
+  </button>
+
+  <button class="starcard starcard--slim" type="button" data-agent="other" aria-pressed="false" style="--tint:var(--text-dim); --tint-dim:var(--surface2);">
+    <span class="starcard__plus" aria-hidden="true">+</span>
+    <span class="starcard__name">Something else</span>
+    <span class="starcard__line">Copilot, Windsurf, a local model. Works for code; no repo MCP servers.</span>
+  </button>
+
+</div>
+
+<p class="meta" id="deck-note">Pick a card. You can switch whenever you like.</p>
+
+
+<h2 id="s-account">Get an account that works</h2>
+<p><strong>Do this before you install.</strong> Every one of these installs cleanly and then refuses to start without a paid plan, and the error doesn't say so in the words you'd search for. It is the single most common place people lose an evening.</p>
+
+<!-- Referral slots: each of these vendors runs a referral or invite programme,
+     usually eligibility-gated and surfaced inside the product. If your team has
+     one, swap the plain pricing link below for it and say so in a
+     <p class="disclosure"> — an undisclosed referral link is not a good look on
+     an onboarding page teammates are told to trust. -->
+
+<div data-for="claude">
+  <p>Claude Code needs <strong>Pro, Max, Team, or Enterprise</strong>. The free claude.ai tier does not include it.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://claude.ai/pricing">See Claude plans</a>
+  </div>
+</div>
+
+<div data-for="codex">
+  <p>Codex needs a paid <strong>ChatGPT plan</strong> (Plus, Pro, or Business), or API credits if you'd rather pay per token.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://chatgpt.com/pricing">See ChatGPT plans</a>
+  </div>
+</div>
+
+<div data-for="cursor">
+  <p>Cursor's free tier runs out fast on any real codebase. <strong>Pro</strong> is the realistic floor.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://cursor.com/pricing">See Cursor plans</a>
+  </div>
+</div>
+
+<div data-for="other">
+  <p>Whatever you're running, it needs a plan that covers agent use. Most free tiers don't.</p>
+</div>
+
+<div class="callout callout--water"><strong>Ask before you pay.</strong> Plenty of teams cover this centrally, and it would be silly to expense three individual plans a week before that lands.</div>
+
+<h2 id="s-install">Install it</h2>
+<p>Pick where you want it to live. Everything below follows both choices.</p>
+
+<div class="clientbar"><div class="clientbar__opts" id="clientbar"></div></div>
+
+<!-- ── Claude Code ─────────────────────────────────────────────────────────── -->
+
+<div data-when="claude:terminal">
+  <p><strong>macOS, Linux, or WSL</strong> — paste this into Terminal:</p>
+<pre class="term">curl -fsSL https://claude.ai/install.sh | bash</pre>
+  <p><strong>Windows PowerShell:</strong></p>
+<pre class="term">irm https://claude.ai/install.ps1 | iex</pre>
+  <p>Your prompt tells you which Windows shell you're in — PowerShell shows <code>PS C:\</code>, CMD shows <code>C:\</code> without the <code>PS</code>. On native Windows also install <a href="https://git-scm.com/downloads/win">Git for Windows</a>, so the agent can run shell commands through Git Bash.</p>
+  <p>Package managers work too: <code>brew install --cask claude-code</code>, <code>winget install Anthropic.ClaudeCode</code>, or <code>npm install -g @anthropic-ai/claude-code</code> (Node 22+). The <code>curl</code> installer auto-updates in the background; the package managers don't.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/quickstart">Quickstart</a>
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/terminal-guide">Terminal guide</a>
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/troubleshoot-install">If install fails</a>
+  </div>
+</div>
+
+<div data-when="claude:desktop">
+  <p>The same engine with buttons instead of typing. Download, install, then open your <em data-hub-var="projectName">your project</em> folder as the working directory.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://claude.ai/api/desktop/darwin/universal/dmg/latest/redirect">Download for macOS</a>
+    <a class="btn btn--lg" href="https://claude.com/download">Download for Windows</a>
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/desktop-linux">Linux</a>
+  </div>
+  <div class="btn-row">
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/desktop-quickstart">Desktop quickstart</a>
+  </div>
+  <p>One difference worth knowing: the Dashboard's <a href="index.html#s-start">ticket launch buttons</a> can hand a prompt straight to the terminal, VS&nbsp;Code, and the ChatGPT app, but the Claude desktop app has no link that accepts one. Picking <strong>Claude desktop</strong> there copies the prompt and brings the app forward, and you paste it in. One extra keystroke.</p>
+</div>
+
+<div data-when="claude:vscode">
+  <p>Runs in a side panel next to your code, with diffs in the editor's own diff viewer.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="vscode:extension/anthropic.claude-code">Install the VS Code extension</a>
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/vs-code">Extension docs</a>
+  </div>
+  <p>If that button doesn't open VS Code, search <strong>&ldquo;Claude Code&rdquo;</strong> in the Extensions panel. You need VS Code 1.94 or newer.</p>
+</div>
+
+<div data-when="claude:rider">
+  <p><strong>Pick this if you live in a JetBrains IDE.</strong> The plugin gives Claude your current selection, your open file, and the IDE's own inspection errors.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://plugins.jetbrains.com/plugin/27310-claude-code-beta-">Get the JetBrains plugin</a>
+    <a class="btn btn--lg btn--ghost" href="https://code.claude.com/docs/en/jetbrains">JetBrains docs</a>
+  </div>
+  <p><strong>Install the CLI as well.</strong> The plugin doesn't bundle its own copy — it runs <code>claude</code> in Rider's integrated terminal. Do the terminal install first, then add the plugin and restart Rider.</p>
+  <p>Shortcut worth knowing: with the plugin in, <code>Ctrl+Esc</code> (<code>Cmd+Esc</code> on Mac) opens Claude from anywhere in the editor. If you started <code>claude</code> in an outside terminal, type <code>/ide</code> to connect it to Rider.</p>
+  <div class="callout"><strong>A note on the docs.</strong> Anthropic lists IntelliJ, PyCharm, WebStorm and friends by name and says the plugin works with most JetBrains IDEs; it doesn't name Rider explicitly. It's the same platform and it works. If it ever doesn't, the terminal path always does.</div>
+</div>
+
+<div data-when="claude:web">
+  <p>Nothing to install — open it and connect a repo.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://claude.ai/code">Open Claude Code on the web</a>
+  </div>
+  <div class="callout"><strong>Know the limit before you lean on it.</strong> The web client runs in the cloud, so it cannot touch <em>your</em> checkout, run your test suite, or see anything you have not pushed. Fine for reading code and drafting. For work that has to land, come back and pick a client that runs locally.</div>
+</div>
+
+<!-- ── Codex ───────────────────────────────────────────────────────────────── -->
+
+<div data-when="codex:terminal">
+<pre class="term">brew install codex                <span class="c"># macOS</span>
+npm install -g @openai/codex      <span class="c"># any platform, needs Node 22+</span></pre>
+  <p>Then <code>codex login</code>. Run <code>codex</code> in your <em data-hub-var="projectName">your project</em> folder to start a session.</p>
+  <h3>One-time MCP setup</h3>
+  <p>Codex only reads <em>user-level</em> MCP config, so it ignores any <code>.mcp.json</code> committed in your repo. If your project ships MCP servers, add them once and they're wired for good:</p>
+<pre class="term">codex mcp add &lt;name&gt; -- &lt;command that starts the server&gt;</pre>
+  <div class="btn-row">
+    <a class="btn btn--lg btn--ghost" href="https://github.com/openai/codex">Codex on GitHub</a>
+    <a class="btn btn--lg btn--ghost" href="https://developers.openai.com/codex">Codex docs</a>
+  </div>
+</div>
+
+<div data-when="codex:desktop">
+  <p>Codex ships inside the ChatGPT desktop app. Install that, sign in, and Codex is one of the modes.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://chatgpt.com/download/">Download ChatGPT for desktop</a>
+    <a class="btn btn--lg btn--ghost" href="https://developers.openai.com/codex">Codex docs</a>
+  </div>
+  <p>If you already have the CLI, <code>codex app</code> installs and launches the desktop app for you.</p>
+  <div class="callout"><strong>MCP setup is CLI-side.</strong> The <code>codex mcp add</code> command above is what wires your servers. Do the terminal install too if you want Codex using them, not just reading code.</div>
+</div>
+
+<div data-when="codex:vscode">
+  <p>OpenAI ships a VS Code extension that also works in Cursor and Windsurf.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="vscode:extension/openai.chatgpt">Install the VS Code extension</a>
+    <a class="btn btn--lg btn--ghost" href="https://developers.openai.com/codex/ide">Extension docs</a>
+  </div>
+  <p>If the button doesn't open VS Code, search <strong>openai.chatgpt</strong> in the Extensions panel.</p>
+</div>
+
+<div data-when="codex:rider">
+  <p><strong>There is no Codex plugin for Rider.</strong> OpenAI ships extensions for VS Code and Xcode only; JetBrains exposes Codex through its own AI Assistant instead, which wants a JetBrains AI subscription or a ChatGPT login on top of what you already pay.</p>
+  <p><strong>Use the CLI in Rider's integrated terminal.</strong> It's the honest path: same agent, no second subscription, and the same MCP servers your repo already ships.</p>
+<pre class="term">brew install codex        <span class="c"># then open Rider's terminal and run: codex</span></pre>
+  <div class="btn-row">
+    <a class="btn btn--lg btn--ghost" href="https://www.jetbrains.com/help/ai-assistant/codex-agent.html">JetBrains AI Assistant route</a>
+    <a class="btn btn--lg btn--ghost" href="https://github.com/openai/codex">Codex on GitHub</a>
+  </div>
+  <div class="callout callout--water"><strong>If Rider matters more than the provider,</strong> Claude Code has a real JetBrains plugin. Switch your card above and compare.</div>
+</div>
+
+<!-- ── Cursor ──────────────────────────────────────────────────────────────── -->
+
+<div data-when="cursor:editor">
+  <p>Cursor is the editor — there's no separate client to pick. Download, install, then open the <em data-hub-var="projectName">your project</em> folder.</p>
+  <div class="btn-row">
+    <a class="btn btn--lg" href="https://cursor.com/downloads">Download Cursor</a>
+    <a class="btn btn--lg btn--ghost" href="https://docs.cursor.com">Cursor docs</a>
+  </div>
+  <p>If your repo commits a <code>.cursor/mcp.json</code>, those servers are there when you open the project — approve each one the first time Cursor asks.</p>
+  <div class="callout"><strong>JetBrains users, note.</strong> Cursor is a VS Code fork, so choosing it means leaving your IDE for that work. If that is where you want to be, pick Claude Code above.</div>
+</div>
+
+<!-- ── Anything else ───────────────────────────────────────────────────────── -->
+
+<div data-when="other:any">
+  <p>Copilot, Windsurf, JetBrains AI Assistant, a local model — they'll all read and write code fine, and the Dashboard's <a href="index.html#s-start">Copy&nbsp;prompt</a> button hands the same prepared prompt to any of them.</p>
+  <p><strong>What you may not get is MCP.</strong> If your repo ships MCP servers, only the clients above pick them up — so whatever those servers expose is off the table here.</p>
+  <div class="callout callout--water"><strong>Using something good that isn't listed?</strong> Add a card for it. The deck on this page is plain markup and a bit of JSON in <code>hub.config.js</code> — a new agent is one more <code>&lt;button class="starcard"&gt;</code>.</div>
+</div>
+
+<h2 id="s-first">Your first session, in our repo</h2>
+
+<div data-when="claude:terminal">
+<pre class="term">cd path/to/<span data-hub-var="repoDirName">your-project</span>
+claude</pre>
+</div>
+<div data-when="claude:desktop">
+  <p>Open the app, then open your <em data-hub-var="projectName">your project</em> folder as the working directory.</p>
+</div>
+<div data-when="claude:vscode">
+  <p>Open the <em data-hub-var="projectName">your project</em> folder in VS Code, then open the Claude panel. It picks up the folder as its working directory.</p>
+</div>
+<div data-when="claude:rider">
+  <p>Open your project in Rider, then hit <code>Ctrl+Esc</code> (<code>Cmd+Esc</code> on Mac). Or run <code>claude</code> in Rider's integrated terminal — same thing.</p>
+</div>
+<div data-when="claude:web">
+  <p>Connect <code data-hub-var="repo.slug">your-org/your-project</code> as the repo. You're reading, not building.</p>
+</div>
+<div data-when="codex:terminal">
+<pre class="term">cd path/to/<span data-hub-var="repoDirName">your-project</span>
+codex</pre>
+</div>
+<div data-when="codex:desktop">
+  <p>Open the ChatGPT app, switch to Codex, and point it at your <em data-hub-var="projectName">your project</em> folder.</p>
+</div>
+<div data-when="codex:vscode">
+  <p>Open the <em data-hub-var="projectName">your project</em> folder in VS Code and open the Codex panel from the sidebar.</p>
+</div>
+<div data-when="codex:rider">
+  <p>Open Rider's integrated terminal in the <em data-hub-var="projectName">your project</em> folder and run <code>codex</code>.</p>
+</div>
+<div data-when="cursor:editor">
+  <p>Open the <em data-hub-var="projectName">your project</em> folder in Cursor, then open the chat panel with <code>Cmd+L</code> (<code>Ctrl+L</code> on Windows).</p>
+</div>
+<div data-when="other:any">
+  <p>Open the <em data-hub-var="projectName">your project</em> folder however your tool expects, and make sure it can actually read files from disk. If it can't, it's a chat window and this page won't help much.</p>
+</div>
+
+<p>Now ask it something <strong>read-only</strong>. Real questions worth trying:</p>
+<ul>
+  <li>&ldquo;Explain how networked player movement works in this repo. Which files own it?&rdquo;</li>
+  <li>&ldquo;What do our checks actually run before a PR can merge?&rdquo;</li>
+  <li>&ldquo;Where do the Act 1 slice scenes live, and which ones are sandboxes?&rdquo;</li>
+</ul>
+<p>Watch what it does <em>before</em> it answers: it lists directories, opens files, greps for symbols. That's the whole thing. It went and looked.</p>
+
+<div data-when="claude:terminal">
+<pre class="term">claude --version   <span class="c"># prints e.g. 2.1.228 (Claude Code)</span>
+claude doctor      <span class="c"># read-only health check — fixes nothing, breaks nothing</span></pre>
+  <p>If <code>claude</code> isn't found, <a href="https://code.claude.com/docs/en/troubleshoot-install">install troubleshooting</a> matches your exact error to a fix. Never install with <code>sudo npm install -g</code>.</p>
+</div>
+<div data-when="codex:terminal">
+<pre class="term">codex --version   <span class="c"># prints e.g. codex-cli 0.147.0</span>
+codex doctor      <span class="c"># checks install, auth, config, and runtime health</span></pre>
+</div>
+
+<div class="callout"><strong>Ask it to explain things for your first few sessions.</strong> Resist asking it to change anything until we've paired. The repo has real gates and a real branch protocol, and those are much easier to learn with someone beside you than to unpick afterwards.</div>
+
+<div class="callout callout--water"><strong>Send at least one prompt before you close it.</strong> That first message is what registers the <code>claude-cli://</code> link handler with your OS — installing alone doesn't do it. Until you've sent one, the launch buttons on the <a href="index.html#s-start" class="t-water">Dashboard</a> will silently do nothing when you click them.</div>
+
+<h3>Using Codex or something else?</h3>
+<p>Fine — the harness doesn't care which agent you run. The Dashboard's <a href="index.html#s-start" class="t-water">Start here</a> queue can launch <strong>Claude Code</strong> (terminal or VS Code tab) or <strong>Codex</strong> directly, and <strong>Copy prompt</strong> works with anything at all — Cursor, a bare CLI, whatever you've got. Every one of them fills the prompt box and stops; nothing is ever sent on your behalf.</p>
+
+<h2 id="s-paste">The three things that replace copy-pasting</h2>
+<p>If you take nothing else from this page, take these.</p>
+<ol class="steps">
+  <li><strong>It reads the files itself.</strong> Never paste a file, a stack trace, or a chunk of a scene. Name it — &ldquo;look at <code>Assets/Scripts/Net/NetworkedPlayer.cs</code>&rdquo; — and it opens it. Pasting actively makes the answer <em>worse</em>, because it only sees the fragment you chose instead of the code around it.</li>
+  <li><strong>The repo already briefs it.</strong> <code>AGENTS.md</code> loads automatically at the start of every session: the stack, the conventions, the gates, the ticket protocol. You never re-explain the project.</li>
+  <li><strong>Sessions come back.</strong> <code>claude --continue</code> picks up where you left off; <code>claude --resume</code> (or <code>/resume</code> inside a session) lets you choose an older one. In the desktop app and IDE extension, your conversations are listed in the sidebar. No re-establishing context by re-pasting.</li>
+</ol>
+
+<h2 id="s-next">What's next</h2>
+<ol class="steps">
+  <li><strong>New to all of this?</strong> <a href="resources.html">Working with agents 101</a> — zero-assumed-knowledge on-ramp</li>
+  <li><strong>Ready to work?</strong> <a href="guide.html">The Guide</a> — how a ticket becomes a merged PR</li>
+  <li><strong>Stuck, or something above doesn't match what you're seeing?</strong> Ask wherever your team actually talks — then fix this page while it's still fresh, because the next person will hit the same thing</li>
+</ol>
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+
+<script>
+(function () {
+  var AGENTS = ["claude", "codex", "cursor", "other"];
+  var AGENT_KEY = "kfhub.agent";
+  var CLIENT_KEY = "kfhub.client";      // stored per agent: {claude:"rider", codex:"terminal"}
+
+  // Label + order for the second-level pills. The key is the `data-when` suffix.
+  var CLIENT_LABEL = {
+    terminal: "Terminal", desktop: "Desktop app", vscode: "VS Code",
+    rider: "Rider / JetBrains", web: "Web", editor: "The editor", any: "Any of them",
+  };
+  var CLIENT_ORDER = ["terminal", "desktop", "vscode", "rider", "web", "editor", "any"];
+
+  var deck = document.getElementById("deck");
+  var note = document.getElementById("deck-note");
+  var bar = document.getElementById("clientbar");
+  var cards = Array.prototype.slice.call(deck.querySelectorAll(".starcard"));
+  var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function read(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+  function write(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* private mode */ } }
+
+  // Which clients exist for an agent is derived from the markup, so adding a
+  // data-when block is the only edit needed to add an option.
+  function clientsFor(agent) {
+    var found = [];
+    document.querySelectorAll("[data-when]").forEach(function (el) {
+      var parts = el.dataset.when.split(":");
+      if (parts[0] === agent && found.indexOf(parts[1]) === -1) found.push(parts[1]);
+    });
+    return found.sort(function (a, b) { return CLIENT_ORDER.indexOf(a) - CLIENT_ORDER.indexOf(b); });
+  }
+
+  function applyClient(agent, client) {
+    document.querySelectorAll("[data-when]").forEach(function (el) {
+      el.classList.toggle("is-shown", el.dataset.when === agent + ":" + client);
+    });
+    bar.querySelectorAll(".cpill").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.client === client));
+    });
+    var saved = read(CLIENT_KEY) || {};
+    saved[agent] = client;
+    write(CLIENT_KEY, saved);
+  }
+
+  function applyAgent(agent) {
+    cards.forEach(function (c) { c.setAttribute("aria-pressed", String(c.dataset.agent === agent)); });
+    document.querySelectorAll("[data-for]").forEach(function (el) {
+      el.classList.toggle("is-shown", el.dataset.for === agent);
+    });
+    deck.classList.add("deck--chosen");
+    var picked = cards.filter(function (c) { return c.dataset.agent === agent; })[0];
+    note.textContent = "Your pick: " + picked.querySelector(".starcard__name").textContent + ". Switch any time.";
+
+    var clients = clientsFor(agent);
+    // A single option is not a choice — don't make people click a lone pill.
+    bar.parentNode.hidden = clients.length < 2;
+    bar.innerHTML = clients.map(function (c) {
+      return '<button class="cpill" type="button" data-client="' + c + '" aria-pressed="false">' +
+        (CLIENT_LABEL[c] || c) + "</button>";
+    }).join("");
+    bar.querySelectorAll(".cpill").forEach(function (b) {
+      b.addEventListener("click", function () { applyClient(agent, b.dataset.client); });
+    });
+
+    // Default to the client they last used for THIS agent, else the first option,
+    // so the install content is never an empty second step.
+    var remembered = (read(CLIENT_KEY) || {})[agent];
+    applyClient(agent, clients.indexOf(remembered) !== -1 ? remembered : clients[0]);
+  }
+
+  cards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      try { localStorage.setItem(AGENT_KEY, card.dataset.agent); } catch (e) { /* private mode */ }
+      applyAgent(card.dataset.agent);
+    });
+
+    // Holo tilt: the card leans toward the cursor and a sheen tracks it. Pointer-fine
+    // devices only, and never when the reader has asked for reduced motion.
+    if (!fine || still) return;
+    card.addEventListener("pointermove", function (e) {
+      var r = card.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width;
+      var y = (e.clientY - r.top) / r.height;
+      card.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
+      card.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+      card.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg");
+      card.style.setProperty("--rx", ((0.5 - y) * 9).toFixed(2) + "deg");
+    });
+    card.addEventListener("pointerleave", function () {
+      card.style.removeProperty("--rx");
+      card.style.removeProperty("--ry");
+    });
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem(AGENT_KEY); } catch (e) { /* ignore */ }
+  if (AGENTS.indexOf(saved) !== -1) applyAgent(saved);
+  else bar.parentNode.hidden = true;
+})();
+</script>
+</body>
+</html>

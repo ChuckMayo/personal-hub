@@ -1,0 +1,42 @@
+# Cloudflare Pages configuration.
+#
+# EDIT THIS FILE — `name`, `bucket_name` and the HUB_NAME var are yours.
+# `scripts/init.mjs` fills them in for you if you would rather not.
+#
+# Bindings belong here rather than in the dashboard. Once a Pages project has a
+# wrangler.toml, its Bindings panel locks with "Bindings for this project are
+# being managed through wrangler.toml" and anything added there is ignored.
+# That is the better arrangement regardless: the binding is reviewable in a PR
+# and travels with the repo instead of sitting as invisible dashboard state.
+#
+# Because pages_build_output_dir is set, `wrangler pages deploy` must be called
+# WITHOUT a directory argument. Passing `site` as well is an error. See the
+# deploy step in .github/workflows/refresh.yml.
+
+name = "team-hub"
+compatibility_date = "2026-08-13"
+pages_build_output_dir = "site"
+
+# Names this hub to MCP clients. Cosmetic, but it is what an agent shows the
+# person using it, so it should say which hub they are talking to.
+[vars]
+HUB_NAME = "team-hub"
+
+# Backs functions/api/ — the team drop, build downloads and meeting media.
+# Large files cannot live in the deploy itself: Pages refuses any static asset
+# over 25 MiB.
+[[r2_buckets]]
+binding = "HUB_FILES"
+bucket_name = "team-hub-files"
+
+# Preview deploys need their own copy of every binding — a binding declared
+# only for production leaves preview URLs answering 503. Same bucket on
+# purpose: previews should list and serve the real files.
+[env.preview]
+
+[env.preview.vars]
+HUB_NAME = "team-hub"
+
+[[env.preview.r2_buckets]]
+binding = "HUB_FILES"
+bucket_name = "team-hub-files"

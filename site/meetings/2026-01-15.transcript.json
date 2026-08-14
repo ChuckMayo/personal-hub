@@ -1,0 +1,152 @@
+{
+ "source": "example-meeting.wav",
+ "model": "Whisper large-v3 (faster-whisper, CUDA float16)",
+ "durationSec": 2740,
+ "lineCount": 27,
+ "redactions": [
+  {
+   "start": 200,
+   "end": 214,
+   "reason": "Side conversation, unrelated to the agenda. Nothing is behind this marker — it is here to show how a withheld stretch renders.",
+   "marked": true
+  }
+ ],
+ "segments": [
+  {
+   "s": 12,
+   "e": 25.6,
+   "t": "All right, we are recording. Let us start with the import pipeline, because it came up twice this week."
+  },
+  {
+   "s": 26,
+   "e": 43.6,
+   "t": "The short version is that anything past roughly eight minutes falls over, and it is always the large files."
+  },
+  {
+   "s": 44,
+   "e": 57.6,
+   "t": "Have we confirmed it is actually a timeout and not the worker running out of memory?"
+  },
+  {
+   "s": 58,
+   "e": 76.6,
+   "t": "Confirmed. The worker is fine. It is a gateway timeout, and it is the same number every time."
+  },
+  {
+   "s": 77,
+   "e": 82.6,
+   "t": "So we raise the timeout."
+  },
+  {
+   "s": 83,
+   "e": 94.6,
+   "t": "We have raised the timeout twice already. Once to five minutes, once to eight."
+  },
+  {
+   "s": 95,
+   "e": 111.6,
+   "t": "Then that is the answer, isn t it. A timeout is a number you keep raising."
+  },
+  {
+   "s": 112,
+   "e": 130.6,
+   "t": "A timeout is a number you keep raising. A cap is a decision you make once and can explain to somebody."
+  },
+  {
+   "s": 131,
+   "e": 139.6,
+   "t": "What would the cap be?"
+  },
+  {
+   "s": 140,
+   "e": 157.6,
+   "t": "Five hundred and twelve megabytes covers everything we have actually seen except three files last quarter."
+  },
+  {
+   "s": 158,
+   "e": 164.6,
+   "t": "And those three?"
+  },
+  {
+   "s": 165,
+   "e": 181.6,
+   "t": "Those three go through the documented bulk path. It exists, it works, nobody knows about it."
+  },
+  {
+   "s": 182,
+   "e": 195.6,
+   "t": "Then the error message is the real work here. It has to name the limit and point at that path."
+  },
+  {
+   "s": 196,
+   "e": 213.6,
+   "t": "Agreed. Silent truncation would be much worse than a rejection."
+  },
+  {
+   "s": 200,
+   "e": 214,
+   "t": "[ side conversation — 00:03:20–00:03:34 not published ]",
+   "redacted": true
+  },
+  {
+   "s": 214,
+   "e": 227.6,
+   "t": "Let us move on. The checkout test."
+  },
+  {
+   "s": 228,
+   "e": 240.6,
+   "t": "It has been retried three times a run for about a month now."
+  },
+  {
+   "s": 241,
+   "e": 261.6,
+   "t": "We have retried it three times a run for a month. That is not a flaky test any more, that is a test we turned off and kept paying for."
+  },
+  {
+   "s": 262,
+   "e": 273.6,
+   "t": "So quarantine it, ticket it, and put a name on it."
+  },
+  {
+   "s": 274,
+   "e": 290.6,
+   "t": "And it stops gating merges until it is fixed. Otherwise we are just training everyone to ignore red."
+  },
+  {
+   "s": 291,
+   "e": 299.6,
+   "t": "Last thing. Next week."
+  },
+  {
+   "s": 300,
+   "e": 313.6,
+   "t": "Everything has passed locally, which at this point tells us almost nothing."
+  },
+  {
+   "s": 314,
+   "e": 328.6,
+   "t": "Two machines, end to end, with a real build. That is the milestone."
+  },
+  {
+   "s": 329,
+   "e": 340.6,
+   "t": "I will post the build so there is something to run against."
+  },
+  {
+   "s": 341,
+   "e": 357.6,
+   "t": "And I will get acceptance lines onto the three tickets that do not have them, so they show up in the queue."
+  },
+  {
+   "s": 358,
+   "e": 371.6,
+   "t": "Anything without a Done equals line is invisible to the dashboard, which is the point of it."
+  },
+  {
+   "s": 372,
+   "e": 386,
+   "t": "Good. That is the hour."
+  }
+ ]
+}

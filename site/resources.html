@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap guide">
+
+<header class="site" data-hub-shell></header>
+<p class="meta">A living menu — found something that helped you? Add it via a PR. <strong>This page ships as an example</strong>; the links are real, the last two sections are yours to replace.</p>
+<nav class="jumps">
+  <a href="#s-here">Start here</a>
+  <a href="#s-watch">Watch</a>
+  <a href="#s-read">Read</a>
+  <a href="#s-tools">Tools</a>
+  <a href="#s-us">Our stack</a>
+</nav>
+
+<h1>Working with agents 101</h1>
+<p class="lead">Zero-assumed-knowledge on-ramp. An "agent" is just an AI model that can use tools in a loop — read files, run commands, edit code — until a task is done. Everything below builds on that one idea.</p>
+
+<h2 id="s-here">Start here</h2>
+<ol class="steps">
+  <li><strong>Get the mental model</strong> — read <a href="https://www.anthropic.com/news/building-effective-agents">Building Effective Agents</a> (Anthropic). Short, no hype, explains workflows vs. agents and why simple beats clever</li>
+  <li><strong>Install a coding agent</strong> — follow <a href="setup.html">Setup</a>: pick a client, install it, get an account that works. <a href="https://code.claude.com/docs/en/overview">Claude Code</a> is our default. Cursor works too (<a href="https://docs.cursor.com">docs</a>)</li>
+  <li><strong>First session</strong> — open your repo, ask it to explain something you already understand, and judge the answer. Trust is earned per-task, not granted</li>
+  <li><strong>Then switch to how your team works</strong> — the <a href="guide.html">Guide</a>: the gate, the ticket lifecycle, what counts as proof</li>
+</ol>
+
+<h2 id="s-watch">Watch</h2>
+<ul>
+  <li><strong><a href="https://www.youtube.com/watch?v=gh2_PhgZGsM">Claude Code for Beginners Tutorial [Full Course]</a></strong> — full walkthrough from install to real tasks; watch at 1.5×, skip around</li>
+  <li><strong><a href="https://www.youtube.com/watch?v=XTWb5oEfqdY">Claude AI Full Tutorial: From Basics to Agentic AI (2026)</a></strong> — the broader tour, from chat basics up to agentic tools</li>
+  <li><strong><a href="https://www.youtube.com/@anthropic-ai">Anthropic's YouTube channel</a></strong> — official talks and demos, good for "what's actually new vs. noise"</li>
+</ul>
+
+<h2 id="s-read">Read</h2>
+<ul>
+  <li><strong><a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a></strong> — the official "how to get good results" doc: clear asks, small steps, let it verify itself</li>
+  <li><strong><a href="https://code.claude.com/docs/en/overview">Claude Code docs</a></strong> — reference for commands, settings, MCP, everything</li>
+  <li><strong><a href="https://modelcontextprotocol.io">Model Context Protocol (MCP)</a></strong> — the open standard that lets agents drive external tools. Relevant because your build system, your editor and this hub can all be tools an agent uses</li>
+  <li><strong><a href="https://www.anthropic.com/learn/build-with-claude">Anthropic Academy</a></strong> — free structured courses if you prefer a curriculum over a link pile</li>
+</ul>
+
+<h2 id="s-tools">Wiring your own tools in</h2>
+<p>MCP is how an agent reaches things that are not files — your editor, your build system, a database, this hub. Two starting points:</p>
+<ul>
+  <li><strong><a href="https://modelcontextprotocol.io/docs/getting-started/intro">MCP: getting started</a></strong> — what a server is and how a client finds it. Read this before wiring anything</li>
+  <li><strong><a href="https://github.com/modelcontextprotocol/servers">Reference MCP servers</a></strong> — a catalogue of existing ones. Check here before writing your own</li>
+</ul>
+<div class="callout callout--water"><strong>This hub is itself an MCP server.</strong> <code>functions/mcp/</code> exposes meetings, action items, the agent-ready queue and the file store, so an agent working in your repo can read the hub instead of a person relaying it. See the README under <em>Connecting an agent</em>.</div>
+<p class="meta">Replace this section with the servers your team actually pins — and pin a version. Riding <code>@latest</code> on something that can edit your project is how a quiet morning ends.</p>
+
+<h2 id="s-us">Our stack, in one breath</h2>
+<div class="callout"><strong>Example — rewrite this.</strong> One sentence that names your agent, your gate, and where work comes from, e.g. "Claude Code → MCP → the editor, with <code>./check</code> gating every push and the board as the interface for work." When the 101 above clicks, the <a href="guide.html">Guide</a> is the "how we do it here" — and the first real ticket is the actual tutorial.</div>
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+</body>
+</html>

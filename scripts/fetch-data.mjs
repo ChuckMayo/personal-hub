@@ -1,0 +1,241 @@
+#!/usr/bin/env node
+/**
+ * Refresh site/data.json from GitHub and the issue tracker.
+ *
+ * Which repo, which board and which phase tickets all come from
+ * site/hub.config.js — the same file the pages read in the browser. This
+ * script only supplies the credentials and does the fetching.
+ *
+ * Env:
+ *   GH_TOKEN     — GitHub token with read access to config.repo.slug
+ *   JIRA_EMAIL   — Atlassian account email
+ *   JIRA_TOKEN   — Atlassian API token (id.atlassian.com → Security → API tokens)
+ *   JIRA_BASE    — overrides config.tracker.baseUrl; normally unset
+ *
+ * Sections whose credentials are missing (or whose fetch fails) keep their previous
+ * values from the committed data.json, so the site never renders empty.
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { dirname, join } from "node:path";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const OUT = join(ROOT, "site", "data.json");
+
+/* hub.config.js assigns a global rather than exporting, so that the browser can
+   load it with a plain <script> tag and skip a fetch. Importing it here for the
+   side effect is what lets one file serve both without a build step. */
+await import(pathToFileURL(join(ROOT, "site", "hub.config.js")).href);
+const CONFIG = globalThis.HUB_CONFIG;
+if (!CONFIG) throw new Error("site/hub.config.js did not set globalThis.HUB_CONFIG");
+
+const REPO = CONFIG.repo?.slug;
+if (!REPO) throw new Error("hub.config.js: repo.slug is required");
+
+const TRACKER = CONFIG.tracker || {};
+const JIRA_BASE = process.env.JIRA_BASE || TRACKER.baseUrl;
+const PROJECT_KEY = TRACKER.projectKey;
+const PHASES = CONFIG.phases || [];
+const WINDOW_DAYS = CONFIG.windowDays || 7;
+const since = new Date(Date.now() - WINDOW_DAYS * 864e5);
+
+let data = {};
+try { data = JSON.parse(readFileSync(OUT, "utf8")); } catch { /* first run */ }
+
+async function gh(path) {
+  const res = await fetch(`https://api.github.com${path}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.GH_TOKEN}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  if (!res.ok) throw new Error(`GitHub ${path}: ${res.status}`);
+  return res.json();
+}
+
+async function fetchGithub() {
+  const prs = await gh(`/repos/${REPO}/pulls?state=all&per_page=100&sort=updated&direction=desc`);
+  const open = prs
+    .filter((p) => p.state === "open")
+    .map((p) => ({ number: p.number, title: p.title, url: p.html_url, draft: p.draft, branch: p.head.ref }));
+  const mergedRecent = prs
+    .filter((p) => p.merged_at && new Date(p.merged_at) >= since)
+    .map((p) => ({ number: p.number, title: p.title, url: p.html_url, mergedAt: p.merged_at }));
+  const commits = await gh(`/repos/${REPO}/commits?since=${since.toISOString()}&per_page=100`);
+  return {
+    fetchedAt: new Date().toISOString(),
+    windowDays: WINDOW_DAYS,
+    openPrs: open,
+    mergedPrs: mergedRecent,
+    commitCount: commits.length,
+  };
+}
+
+async function jiraSearch(jql, fields) {
+  const issues = [];
+  let nextPageToken;
+  do {
+    const params = new URLSearchParams({ jql, fields, maxResults: "100" });
+    if (nextPageToken) params.set("nextPageToken", nextPageToken);
+    const res = await fetch(`${JIRA_BASE}/rest/api/3/search/jql?${params}`, {
+      headers: {
+        Authorization: "Basic " + Buffer.from(`${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`).toString("base64"),
+        Accept: "application/json",
+      },
+    });
+    if (!res.ok) throw new Error(`Jira search: ${res.status}`);
+    const page = await res.json();
+    issues.push(...(page.issues || []));
+    nextPageToken = page.nextPageToken;
+  } while (nextPageToken);
+  return issues;
+}
+
+// Epic activity is derived from children — epic statuses aren't maintained on this board
+// (all 10 sit at "To Do" regardless of real progress), and epics carry no dates.
+function rollupEpics(issues) {
+  const epics = new Map();
+  for (const i of issues) {
+    if (i.fields.issuetype?.name !== "Epic") continue;
+    epics.set(i.key, {
+      key: i.key,
+      name: i.fields.summary,
+      url: `${JIRA_BASE}/browse/${i.key}`,
+      status: i.fields.status.name,
+      dueDate: i.fields.duedate || null,
+      total: 0, done: 0, inProgress: 0, inReview: 0, doneRecent: 0,
+      lastActivity: null,
+    });
+  }
+  for (const i of issues) {
+    const e = epics.get(i.fields.parent?.key);
+    if (!e) continue;
+    const s = i.fields.status.name;
+    e.total++;
+    if (s === "Done") {
+      e.done++;
+      if (new Date(i.fields.updated) >= since) e.doneRecent++;
+    } else if (s === "In Progress") e.inProgress++;
+    else if (s === "In Review") e.inReview++;
+    if (!e.lastActivity || i.fields.updated > e.lastActivity) e.lastActivity = i.fields.updated;
+  }
+  const state = (e) =>
+    e.status === "Done" || (e.total > 0 && e.done === e.total) ? "done"
+    : e.inProgress + e.inReview + e.doneRecent > 0 || e.status === "In Progress" ? "active"
+    : "upcoming";
+  const rank = { done: 0, active: 1, upcoming: 2 };
+  return [...epics.values()]
+    .map((e) => ({ ...e, state: state(e) }))
+    .sort((a, b) =>
+      rank[a.state] - rank[b.state] ||
+      (a.state === "active" ? (b.lastActivity || "").localeCompare(a.lastActivity || "") : 0) ||
+      a.key.localeCompare(b.key, undefined, { numeric: true }));
+}
+
+// Jira v3 returns descriptions as ADF (a node tree), not markdown. Walk it for text
+// and keep block boundaries as newlines so a "Done =" line stays on its own line.
+function adfToText(node) {
+  if (!node || typeof node !== "object") return "";
+  if (node.type === "text") return node.text ?? "";
+  if (node.type === "hardBreak") return "\n";
+  const inner = (node.content || []).map(adfToText).join("");
+  const isBlock = ["paragraph", "heading", "listItem", "blockquote", "codeBlock", "panel"].includes(node.type);
+  return isBlock ? `${inner}\n` : inner;
+}
+
+// The Guide's convention: a BF ticket carrying a "Done =" acceptance line IS an
+// agent-ready spec. That makes the filter honest — and gives writing the line a
+// point, since tickets without one simply don't appear in the queue.
+const ACCEPTANCE = /^\s*Done\s*[=:]\s*(.+)$/im;
+
+function agentReadyQueue(issues) {
+  const todo = issues.filter(
+    (i) => i.fields.issuetype?.name !== "Epic" && i.fields.status.name === "To Do",
+  );
+  const ready = todo
+    .map((i) => {
+      const text = adfToText(i.fields.description).replace(/\n{3,}/g, "\n\n").trim();
+      const done = text.match(ACCEPTANCE)?.[1]?.trim();
+      return done
+        ? {
+            key: i.key,
+            summary: i.fields.summary,
+            url: `${JIRA_BASE}/browse/${i.key}`,
+            done,
+            assignee: i.fields.assignee?.displayName ?? null,
+            epic: i.fields.parent?.fields?.summary ?? null,
+            updated: i.fields.updated,
+          }
+        : null;
+    })
+    .filter(Boolean)
+    // Unclaimed first — those are the ones anyone can pick up — then most recently touched.
+    .sort((a, b) =>
+      Number(Boolean(a.assignee)) - Number(Boolean(b.assignee)) ||
+      (b.updated || "").localeCompare(a.updated || ""));
+  // Report the gap, don't hide it. Most To Do tickets have no acceptance line, and a
+  // queue that silently shows 2 of 30 reads as broken. Naming the shortfall turns the
+  // filter into a visible prompt to write the line.
+  return { tickets: ready.slice(0, 12), todoTotal: todo.length, readyTotal: ready.length };
+}
+
+async function fetchJira() {
+  const issues = await jiraSearch(
+    `project = ${PROJECT_KEY}`,
+    "summary,status,issuetype,updated,parent,duedate,description,assignee",
+  );
+  const byKey = Object.fromEntries(issues.map((i) => [i.key, i]));
+  // The page links each phase straight from this url, so it never has to know
+  // the tracker's URL shape.
+  const phases = PHASES.map((p) => ({
+    ...p,
+    url: `${JIRA_BASE}/browse/${p.key}`,
+    status: byKey[p.key]?.fields.status.name ?? "Unknown",
+    summary: byKey[p.key]?.fields.summary ?? "",
+  }));
+  const statusCounts = {};
+  for (const i of issues) {
+    const s = i.fields.status.name;
+    statusCounts[s] = (statusCounts[s] || 0) + 1;
+  }
+  const doneRecent = issues
+    .filter((i) => i.fields.status.name === "Done" && new Date(i.fields.updated) >= since)
+    .sort((a, b) => new Date(b.fields.updated) - new Date(a.fields.updated))
+    .slice(0, 12)
+    .map((i) => ({ key: i.key, summary: i.fields.summary, url: `${JIRA_BASE}/browse/${i.key}` }));
+  const inReview = issues
+    .filter((i) => i.fields.status.name === "In Review")
+    .map((i) => ({ key: i.key, summary: i.fields.summary, url: `${JIRA_BASE}/browse/${i.key}` }));
+  return {
+    fetchedAt: new Date().toISOString(),
+    windowDays: WINDOW_DAYS,
+    totalIssues: issues.length,
+    statusCounts,
+    epics: rollupEpics(issues),
+    phases,
+    doneRecent,
+    inReview,
+    agentReady: agentReadyQueue(issues),
+  };
+}
+
+let ok = true;
+if (process.env.GH_TOKEN) {
+  try { data.github = await fetchGithub(); console.log("github: refreshed"); }
+  catch (e) { ok = false; console.error("github: FAILED —", e.message, "(keeping previous data)"); }
+} else console.warn("github: GH_TOKEN not set, keeping previous data");
+
+if (TRACKER.kind && TRACKER.kind !== "jira") {
+  console.warn(`tracker: "${TRACKER.kind}" has no adapter — jira is the only one implemented`);
+} else if (!JIRA_BASE || !PROJECT_KEY) {
+  console.warn("tracker: hub.config.js has no tracker.baseUrl/projectKey, keeping previous data");
+} else if (process.env.JIRA_EMAIL && process.env.JIRA_TOKEN) {
+  try { data.jira = await fetchJira(); console.log("jira: refreshed"); }
+  catch (e) { ok = false; console.error("jira: FAILED —", e.message, "(keeping previous data)"); }
+} else console.warn("jira: JIRA_EMAIL/JIRA_TOKEN not set, keeping previous data");
+
+data.generatedAt = new Date().toISOString();
+writeFileSync(OUT, JSON.stringify(data, null, 2) + "\n");
+console.log(`wrote ${OUT}`);
+process.exit(ok ? 0 : 0); // stale-but-rendering beats a dead refresh; failures are logged above

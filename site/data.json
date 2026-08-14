@@ -1,0 +1,246 @@
+{
+  "note": "EXAMPLE DATA shipped with team-hub so a fresh clone renders a full dashboard. scripts/fetch-data.mjs overwrites this entirely on its first successful run.",
+  "github": {
+    "fetchedAt": "2026-01-15T12:00:00.000Z",
+    "windowDays": 7,
+    "openPrs": [
+      {
+        "number": 412,
+        "title": "ATL-13: cap import input at 512 MB",
+        "url": "https://github.com/northwind-labs/atlas/pull/412",
+        "draft": false,
+        "branch": "ATL-13-cap-import-input-at"
+      },
+      {
+        "number": 411,
+        "title": "ATL-19: quarantine the flaky checkout test",
+        "url": "https://github.com/northwind-labs/atlas/pull/411",
+        "draft": true,
+        "branch": "ATL-19-quarantine-the-flaky-checkout"
+      }
+    ],
+    "mergedPrs": [
+      {
+        "number": 410,
+        "title": "ATL-12: retry transient upload failures once",
+        "url": "https://github.com/northwind-labs/atlas/pull/410",
+        "mergedAt": "2026-01-14T12:00:00.000Z"
+      },
+      {
+        "number": 409,
+        "title": "ATL-11: pin the worker image digest",
+        "url": "https://github.com/northwind-labs/atlas/pull/409",
+        "mergedAt": "2026-01-13T12:00:00.000Z"
+      },
+      {
+        "number": 408,
+        "title": "ATL-18: surface the import size in the job log",
+        "url": "https://github.com/northwind-labs/atlas/pull/408",
+        "mergedAt": "2026-01-11T12:00:00.000Z"
+      }
+    ],
+    "commitCount": 37
+  },
+  "jira": {
+    "fetchedAt": "2026-01-15T12:00:00.000Z",
+    "windowDays": 7,
+    "totalIssues": 42,
+    "statusCounts": {
+      "To Do": 19,
+      "In Progress": 4,
+      "In Review": 2,
+      "Done": 17
+    },
+    "epics": [
+      {
+        "key": "ATL-2",
+        "name": "Import pipeline",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-2",
+        "status": "In Progress",
+        "dueDate": null,
+        "total": 14,
+        "done": 9,
+        "inProgress": 2,
+        "inReview": 1,
+        "doneRecent": 3,
+        "lastActivity": "2026-01-15T12:00:00.000Z",
+        "state": "active"
+      },
+      {
+        "key": "ATL-3",
+        "name": "Checkout flow",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-3",
+        "status": "In Progress",
+        "dueDate": "2026-02-27",
+        "total": 11,
+        "done": 5,
+        "inProgress": 2,
+        "inReview": 1,
+        "doneRecent": 1,
+        "lastActivity": "2026-01-14T12:00:00.000Z",
+        "state": "active"
+      },
+      {
+        "key": "ATL-1",
+        "name": "Foundations",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-1",
+        "status": "Done",
+        "dueDate": null,
+        "total": 9,
+        "done": 9,
+        "inProgress": 0,
+        "inReview": 0,
+        "doneRecent": 0,
+        "lastActivity": "2025-12-25T12:00:00.000Z",
+        "state": "done"
+      },
+      {
+        "key": "ATL-4",
+        "name": "Reporting",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-4",
+        "status": "To Do",
+        "dueDate": "2026-04-10",
+        "total": 8,
+        "done": 0,
+        "inProgress": 0,
+        "inReview": 0,
+        "doneRecent": 0,
+        "lastActivity": null,
+        "state": "upcoming"
+      }
+    ],
+    "phases": [
+      {
+        "phase": "P0",
+        "key": "ATL-11",
+        "name": "Foundation",
+        "desc": "The thing everything else sits on",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-11",
+        "status": "Done",
+        "summary": "Foundation"
+      },
+      {
+        "phase": "P1",
+        "key": "ATL-12",
+        "name": "Core loop",
+        "desc": "The path a user actually takes",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-12",
+        "status": "Done",
+        "summary": "Core loop"
+      },
+      {
+        "phase": "P2",
+        "key": "ATL-13",
+        "name": "State",
+        "desc": "Persist it, sync it, restore it",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-13",
+        "status": "In Progress",
+        "summary": "State"
+      },
+      {
+        "phase": "P3",
+        "key": "ATL-14",
+        "name": "Risk spike",
+        "desc": "The part nobody is sure about yet",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-14",
+        "status": "In Review",
+        "summary": "Risk spike"
+      },
+      {
+        "phase": "P4",
+        "key": "ATL-15",
+        "name": "End to end",
+        "desc": "Two machines, one flow",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-15",
+        "status": "To Do",
+        "summary": "End to end"
+      },
+      {
+        "phase": "P5",
+        "key": "ATL-16",
+        "name": "QA + hardening",
+        "desc": "Before the slice ships",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-16",
+        "status": "To Do",
+        "summary": "QA + hardening"
+      }
+    ],
+    "doneRecent": [
+      {
+        "key": "ATL-12",
+        "summary": "Retry transient upload failures once",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-12"
+      },
+      {
+        "key": "ATL-11",
+        "summary": "Pin the worker image digest",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-11"
+      },
+      {
+        "key": "ATL-18",
+        "summary": "Surface the import size in the job log",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-18"
+      },
+      {
+        "key": "ATL-22",
+        "summary": "Drop the unused legacy exporter",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-22"
+      }
+    ],
+    "inReview": [
+      {
+        "key": "ATL-13",
+        "summary": "Cap import input at 512 MB",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-13"
+      },
+      {
+        "key": "ATL-19",
+        "summary": "Quarantine the flaky checkout test",
+        "url": "https://northwind-labs.atlassian.net/browse/ATL-19"
+      }
+    ],
+    "agentReady": {
+      "todoTotal": 19,
+      "readyTotal": 4,
+      "tickets": [
+        {
+          "key": "ATL-24",
+          "summary": "Import errors should name the size limit",
+          "url": "https://northwind-labs.atlassian.net/browse/ATL-24",
+          "done": "an over-size import is rejected before work starts, with an error naming the 512 MB limit and linking the bulk path",
+          "assignee": null,
+          "epic": "Import pipeline",
+          "updated": "2026-01-15T12:00:00.000Z"
+        },
+        {
+          "key": "ATL-25",
+          "summary": "Job log shows elapsed time per stage",
+          "url": "https://northwind-labs.atlassian.net/browse/ATL-25",
+          "done": "each pipeline stage logs its own duration, so a slow import points at a stage instead of a total",
+          "assignee": null,
+          "epic": "Import pipeline",
+          "updated": "2026-01-14T12:00:00.000Z"
+        },
+        {
+          "key": "ATL-26",
+          "summary": "Checkout retries are bounded and logged",
+          "url": "https://northwind-labs.atlassian.net/browse/ATL-26",
+          "done": "a retry is attempted at most twice and every attempt appears in the log with its reason",
+          "assignee": "Grace",
+          "epic": "Checkout flow",
+          "updated": "2026-01-13T12:00:00.000Z"
+        },
+        {
+          "key": "ATL-27",
+          "summary": "Restore reopens the last-used workspace",
+          "url": "https://northwind-labs.atlassian.net/browse/ATL-27",
+          "done": "restarting restores the workspace that was open, including unsaved draft state",
+          "assignee": "Ada",
+          "epic": "Checkout flow",
+          "updated": "2026-01-12T12:00:00.000Z"
+        }
+      ]
+    }
+  },
+  "generatedAt": "2026-01-15T12:00:00.000Z"
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site" data-hub-shell></header>
+<p class="meta" id="generated">loading…</p>
+<nav class="jumps">
+  <a href="#s-start" data-needs-tracker>Start here</a>
+  <a href="#s-timeline" data-needs-tracker>Timeline</a>
+  <a href="#s-numbers">Numbers</a>
+  <a href="#s-shots">Screenshots</a>
+  <a href="#s-plan" data-needs-phases>P0–P5</a>
+  <a href="#s-prs">Open PRs</a>
+  <a href="#s-review" data-needs-tracker>In review</a>
+  <a href="#s-done" data-needs-tracker>Done</a>
+  <a href="#s-links">Links</a>
+</nav>
+
+<section class="quickbar" aria-label="Quick actions">
+  <span class="quickbar__label">Quick</span>
+  <a class="btn btn--lg btn--ghost" data-icon="↑" href="files.html#s-drop">Drop a file</a>
+  <a class="btn btn--lg btn--ghost" data-icon="↓" href="files.html#s-builds">Latest build</a>
+  <a class="btn btn--lg btn--ghost" data-icon="→" href="meetings.html">Latest meeting</a>
+</section>
+
+<h1>What we're building right now</h1>
+<p class="lead" data-needs-tracker>Updates automatically to show <a id="epics-link">epics</a> with active tickets.</p>
+
+
+
+<!-- The four reference lists live at the top where they are reachable, but folded
+     so they do not push the actual dashboard below the fold. Native <details>:
+     keyboard and screen-reader behaviour for free, and it still works if the
+     script never loads. Counts sit in the header so a closed section still
+     tells you whether it is worth opening. -->
+<div class="folds">
+  <details class="fold" id="s-prs" data-fold="prs" open>
+    <summary class="fold__head"><span class="fold__icon">⇄</span>Open PRs<span class="fold__count" id="n-open-prs">–</span></summary>
+    <div class="fold__body"><ul class="rows" id="open-prs"></ul></div>
+  </details>
+
+  <details class="fold" id="s-review" data-fold="review" data-needs-tracker>
+    <summary class="fold__head"><span class="fold__icon">◑</span>In review on the board<span class="fold__count" id="n-in-review">–</span></summary>
+    <div class="fold__body"><ul class="rows" id="in-review"></ul></div>
+  </details>
+
+  <details class="fold" id="s-done" data-fold="done" data-needs-tracker>
+    <summary class="fold__head"><span class="fold__icon">✓</span>Recently done<span class="fold__count" id="n-done-recent">–</span></summary>
+    <div class="fold__body"><ul class="rows" id="done-recent"></ul></div>
+  </details>
+
+  <details class="fold" id="s-links" data-fold="links">
+    <summary class="fold__head"><span class="fold__icon">↗</span>Links</summary>
+    <div class="fold__body">
+      <div class="links" id="links"></div>
+    </div>
+  </details>
+</div>
+
+<div class="epic-hero" id="active-epics" data-needs-tracker></div>
+
+<h2 id="s-start" data-needs-tracker>Start here with an agent</h2>
+<p class="lead" data-needs-tracker>To Do tickets that carry a <code>Done =</code> acceptance line — which is what makes a ticket an agent-ready spec. Pick a prompt and it opens your agent in this repo with the text ready. <strong>Nothing sends until you press enter.</strong></p>
+<div class="launchbar" data-needs-tracker>
+  <span class="launchbar__label">Launch with</span>
+  <div class="launchbar__opts" id="launcher"></div>
+</div>
+<div id="agent-ready" data-needs-tracker></div>
+
+<h2 id="s-timeline" data-needs-tracker>Epic timeline</h2>
+<p class="lead" data-needs-tracker>All epics in sequence — shipped, in motion, and still ahead. Progress is rolled up from each epic's child tickets.</p>
+<div class="timeline-scroll" data-needs-tracker><div class="timeline" id="timeline"></div></div>
+
+<h2 id="s-numbers">This week in numbers</h2>
+<div class="kpis" id="kpis"></div>
+
+<h2 id="s-shots">Latest from the build</h2>
+<p class="lead">Proof shots off the most recent PRs, newest first. Click any of them to open it full size — or see <a href="files.html#s-shots">the whole gallery</a>.</p>
+<div class="shots" id="shots"></div>
+
+<div class="btn-row">
+  <a class="btn btn--lg btn--ghost" data-icon="↑" href="files.html#s-drop">Share a shot or a capture</a>
+  <a class="btn btn--lg btn--ghost" data-icon="→" href="files.html#s-shots">All screenshots</a>
+</div>
+
+<h2 id="s-plan" data-needs-phases>The P0–P5 plan</h2>
+<p class="lead" id="phases-blurb" data-needs-phases></p>
+<div class="phases" id="phases" data-needs-phases></div>
+
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+<script>
+/* hub.js is deferred: it runs after this inline script is parsed but before
+   DOMContentLoaded fires. A cached data.json can resolve faster than that, so
+   anything needing its launcher API waits here rather than racing it. */
+const hubReady = new Promise((resolve) => {
+  if (document.readyState !== "loading") resolve();
+  else document.addEventListener("DOMContentLoaded", resolve, { once: true });
+});
+
+/* Numbers tick up from zero on load — the point of this row is "how much moved
+   this week", and watching it land reads faster than a static figure. Anyone
+   who has asked the OS for less motion just gets the final number. */
+function countUp() {
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  for (const el of document.querySelectorAll(".kpi__val[data-to]")) {
+    const to = Number(el.dataset.to);
+    // requestAnimationFrame does not run in a background tab, so animating there
+    // would zero the number and never restore it — someone opening the hub in a
+    // background tab would come back to 0 across the board. Correctness first:
+    // if we cannot animate, the real figure just stays put.
+    if (!Number.isFinite(to) || to === 0 || still || document.visibilityState !== "visible") continue;
+    const started = performance.now(), ms = 700;
+    const step = (now) => {
+      const p = Math.min(1, (now - started) / ms);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    el.textContent = "0";
+    requestAnimationFrame(step);
+  }
+}
+
+const CONFIG = globalThis.HUB_CONFIG || {};
+
+const CHIP = (s) => {
+  const cls = /done/i.test(s) ? "done" : /review/i.test(s) ? "review" : /progress/i.test(s) ? "progress" : "todo";
+  return `<span class="chip chip--${cls}">${s}</span>`;
+};
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* Board sections are removed outright when no tracker is configured, so every
+   write below goes through this — a missing target is an expected state, not
+   an error, and one throw here would abort the whole render. */
+const setHTML = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+/* A hub with no issue tracker is a legitimate setup — plenty of teams run on
+   GitHub alone. Every board-derived section is marked data-needs-tracker (and
+   the phase plan data-needs-phases, since it also needs a plan to draw), and
+   they come out of the page entirely rather than sitting there empty.
+
+   Removing beats hiding: the jump links go with their sections, so the page
+   has no dead anchors, and nothing renders a "no data yet" placeholder for a
+   feature this hub was never configured to have. */
+const tracker = CONFIG.tracker || {};
+const hasTracker = Boolean(tracker.baseUrl && tracker.projectKey);
+const hasPhases = hasTracker && (CONFIG.phases || []).length > 0;
+
+if (!hasTracker) for (const el of document.querySelectorAll("[data-needs-tracker]")) el.remove();
+if (!hasPhases) for (const el of document.querySelectorAll("[data-needs-phases]")) el.remove();
+
+/* Links are pure config — render them before the fetch so they are there even
+   if data.json never arrives. */
+document.getElementById("links").innerHTML = (CONFIG.links || [])
+  .map((l) => `<a href="${esc(l.href)}">${esc(l.label)}</a>`).join("");
+
+const epicsLink = document.getElementById("epics-link");
+if (epicsLink && tracker.timelineUrl) epicsLink.href = tracker.timelineUrl;
+
+const blurb = document.getElementById("phases-blurb");
+if (blurb) blurb.textContent = CONFIG.phasesBlurb || "";
+
+fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
+  const gh = d.github || {}, jira = d.jira || {};
+  const days = gh.windowDays || jira.windowDays || CONFIG.windowDays || 7;
+
+  document.getElementById("generated").textContent =
+    "data refreshed " + (d.generatedAt ? new Date(d.generatedAt).toLocaleString() : "—") + ` · rolling ${days}-day window`;
+
+  const ago = (iso) => {
+    if (!iso) return "no ticket activity yet";
+    const dd = Math.floor((Date.now() - new Date(iso)) / 864e5);
+    return dd <= 0 ? "active today" : dd === 1 ? "active yesterday" : `last activity ${dd}d ago`;
+  };
+  const pct = (e) => (e.total ? Math.round((e.done / e.total) * 100) : 0);
+  const epics = jira.epics || [];
+  const active = epics.filter((e) => e.state === "active");
+
+  setHTML("active-epics", active.map((e) => `
+    <div class="epic">
+      <div class="epic__head">
+        <span class="epic__key"><a href="${e.url}">${e.key}</a></span>
+        <span class="epic__ago">${ago(e.lastActivity)}</span>
+      </div>
+      <div class="epic__name"><a href="${e.url}">${esc(e.name)}</a></div>
+      <div class="epic__bar"><div class="epic__fill" style="width:${pct(e)}%"></div></div>
+      <div class="epic__stats">
+        <span>${e.done}/${e.total} done</span>
+        ${e.inProgress ? `<span class="chip chip--progress">${e.inProgress} in progress</span>` : ""}
+        ${e.inReview ? `<span class="chip chip--review">${e.inReview} in review</span>` : ""}
+        ${e.doneRecent ? `<span class="chip chip--done">${e.doneRecent} done · ${days}d</span>` : ""}
+      </div>
+    </div>`).join("") ||
+    `<p class="lead">${epics.length ? "No epic has moved recently — the board is quiet." : "No epic data yet — waiting on the next scheduled refresh."}</p>`);
+
+  setHTML("timeline", epics.map((e) => `
+    <div class="tl__node tl__node--${e.state}">
+      <div class="tl__dot"></div>
+      <div class="tl__key">${e.key}</div>
+      <div class="tl__name"><a href="${e.url}">${esc(e.name)}</a></div>
+      <div class="tl__bar"><div class="tl__fill" style="width:${pct(e)}%"></div></div>
+      <div class="tl__meta">${e.total ? `${e.done}/${e.total}` : "unscoped"}${e.dueDate ? ` · due ${e.dueDate}` : ""}</div>
+    </div>`).join("") ||
+    '<p class="lead">No epic data yet — waiting on the next scheduled refresh.</p>');
+
+  const doneCount = (jira.doneRecent || []).length;
+  setHTML("kpis", [
+    { v: (gh.openPrs || []).length, l: "open PRs", s: "awaiting eyes", tone: "accent", icon: "⇄" },
+    { v: (gh.mergedPrs || []).length, l: `PRs merged · ${days}d`, s: "to main", tone: "water", icon: "⇥" },
+    { v: gh.commitCount ?? "—", l: `commits · ${days}d`, s: "default branch", tone: "water", icon: "◆" },
+    // The only board-derived card — it goes with the rest of the board.
+    ...(hasTracker
+      ? [{ v: doneCount, l: `tickets done · ${days}d`, s: tracker.label || "the board", tone: "green", icon: "✓" }]
+      : []),
+  ].map((k) => `
+    <div class="kpi kpi--${k.tone}">
+      <span class="kpi__icon">${k.icon}</span>
+      <div class="kpi__val" data-to="${Number.isFinite(Number(k.v)) ? Number(k.v) : ""}">${k.v}</div>
+      <div class="kpi__label">${k.l}</div>
+      <div class="kpi__sub">${k.s}</div>
+    </div>`).join(""));
+  countUp();
+
+  setHTML("phases", (jira.phases || []).map((p) => `
+    <div class="phase">
+      <div class="phase__tag">${p.phase}</div>
+      <div class="phase__name">${esc(p.name)}</div>
+      <div class="phase__desc">${esc(p.desc)}</div>
+      <div class="phase__row">
+        <span class="phase__key"><a href="${esc(p.url || "#")}">${esc(p.key)}</a></span>
+        ${CHIP(p.status)}
+      </div>
+    </div>`).join("") || '<p class="lead">No phase data yet — run the refresh.</p>');
+
+  const li = (id, t, url, extra = "") => `<li><span class="id"><a href="${url}">${id}</a></span><span class="t"><a href="${url}">${esc(t)}</a></span>${extra}</li>`;
+  const empty = '<li><span class="t t-dim">nothing right now</span></li>';
+
+  const count = (id, n, hot) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n;
+    el.classList.toggle("fold__count--hot", Boolean(hot) && n > 0);
+  };
+  count("n-open-prs", (gh.openPrs || []).length, true);
+  count("n-in-review", (jira.inReview || []).length, true);
+  count("n-done-recent", doneCount);
+
+  setHTML("open-prs",
+    (gh.openPrs || []).map((p) => li("#" + p.number, p.title, p.url, p.draft ? '<span class="badge chip chip--todo">draft</span>' : "")).join("") || empty);
+  setHTML("in-review",
+    (jira.inReview || []).map((i) => li(i.key, i.summary, i.url)).join("") || empty);
+  setHTML("done-recent",
+    (jira.doneRecent || []).map((i) => li(i.key, i.summary, i.url, '<span class="badge chip chip--done">done</span>')).join("") || empty);
+
+  renderAgentQueue(jira.agentReady);
+}).catch(() => {
+  document.getElementById("generated").textContent = "data.json missing — run scripts/fetch-data.mjs";
+});
+
+
+const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").split("-").slice(0, 5).join("-");
+
+/* Prompt templates live in hub.config.js — they encode a team's harness, gates
+   and vocabulary, which is exactly the kind of thing that should not be buried
+   in a page. They are text with {placeholders} rather than functions, so the
+   config file stays data that anyone can edit. An unknown placeholder is left
+   as-is: better a visible {oops} in the prompt box than a silent "undefined". */
+const PROMPTS = CONFIG.prompts || [];
+
+const fill = (template, t) => {
+  const values = {
+    key: t.key,
+    summary: t.summary,
+    done: t.done,
+    branch: `${t.key}-${slugify(t.summary)}`,
+    repo: (CONFIG.repo || {}).slug || "",
+  };
+  return String(template).replace(/\{(\w+)\}/g, (whole, name) =>
+    Object.prototype.hasOwnProperty.call(values, name) ? values[name] : whole);
+};
+
+
+async function renderAgentQueue(queue) {
+  const host = document.getElementById("agent-ready");
+  const bar = document.getElementById("launcher");
+  if (!host || !bar) return; // no tracker configured — the whole section is gone
+  const tickets = queue?.tickets;
+
+  if (!Array.isArray(tickets)) {
+    bar.innerHTML = "";
+    host.innerHTML = '<div class="card"><p class="lead m-0">This queue appears after the next data refresh (every 6 hours, or on push).</p></div>';
+    return;
+  }
+  if (!tickets.length) {
+    bar.innerHTML = "";
+    host.innerHTML = `<div class="card"><p class="lead m-0">None of the ${queue.todoTotal || 0} To&nbsp;Do tickets has a <code>Done =</code> acceptance line yet. Add one to a ticket and it appears here.</p></div>`;
+    return;
+  }
+  const gap = (queue.todoTotal || 0) - (queue.readyTotal || tickets.length);
+
+  await hubReady;
+  const active = window.kfCurrentLauncher();
+  bar.innerHTML = window.KF_LAUNCHERS.map((l) => `
+    <button class="btn btn--sm btn--pill" type="button" data-launcher="${l.id}" aria-pressed="${l.id === active}" title="${esc(l.note)}">${esc(l.label)}</button>`).join("");
+
+  host.innerHTML = `<div class="queue">${tickets.map((t, ti) => `
+    <article class="tk">
+      <div class="tk__head">
+        <span class="epic__key"><a href="${t.url}">${t.key}</a></span>
+        ${t.assignee ? `<span class="chip chip--progress">${esc(t.assignee)}</span>` : '<span class="chip chip--todo">unclaimed</span>'}
+        ${t.epic ? `<span class="tk__epic">${esc(t.epic)}</span>` : ""}
+      </div>
+      <h3 class="tk__name">${esc(t.summary)}</h3>
+      <p class="tk__done"><strong>Done =</strong> ${esc(t.done)}</p>
+      <div class="tk__acts">
+        ${PROMPTS.map((p, pi) => `<button class="btn btn--sm" type="button" data-icon="▸" data-t="${ti}" data-p="${pi}" title="${esc(p.hint)}">${esc(p.label)}</button>`).join("")}
+      </div>
+    </article>`).join("")}</div>${gap > 0 ? `
+    <p class="meta mt-2">${queue.readyTotal} of ${queue.todoTotal} To&nbsp;Do tickets are agent-ready. The other ${gap} have no <code>Done =</code> line yet — add one and they show up here.</p>` : ""}`;
+
+  bar.querySelectorAll("[data-launcher]").forEach((b) => b.addEventListener("click", () => {
+    window.kfSetLauncher(b.dataset.launcher);
+    renderAgentQueue(queue);
+  }));
+
+  host.querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", async () => {
+    const ticket = tickets[Number(b.dataset.t)];
+    const spec = PROMPTS[Number(b.dataset.p)];
+    const was = b.textContent;
+    b.classList.add("btn--ok");
+    b.textContent = await window.kfLaunchAgent({
+      prompt: fill(spec.text, ticket), label: spec.label, source: ticket.key,
+    });
+    setTimeout(() => { b.textContent = was; b.classList.remove("btn--ok"); }, 1800);
+  }));
+}
+
+/* ---- latest screenshots -------------------------------------------------- */
+/* The same manifest the Files page gallery reads, trimmed to the newest five.
+   The section stays empty if the manifest is missing rather than shouting
+   about it on the landing page. */
+fetch("img/proof/manifest.json", { cache: "no-cache" })
+  .then((r) => { if (!r.ok) throw new Error("no manifest"); return r.json(); })
+  .then((d) => {
+    const shots = (d.shots || []).slice(0, 5);
+    if (!shots.length) return;
+    const days = (iso) => Math.floor((Date.now() - new Date(iso)) / 864e5);
+    const when = (iso) => {
+      const n = days(iso);
+      return n <= 0 ? "today" : n === 1 ? "yesterday" : `${n}d ago`;
+    };
+    const card = (s, cls) => `
+      <figure class="shot ${cls}">
+        ${days(s.date) <= 7 ? '<span class="shot__flag">new</span>' : ""}
+        <img src="img/proof/${esc(s.file)}" data-lightbox="img/proof/${esc(s.file)}"
+             alt="${esc(s.title)}" loading="lazy">
+        <figcaption class="shot__body">
+          <div class="shot__name">${esc(s.title)}</div>
+          <div class="shot__meta">${esc(s.ticket)} · <a href="${esc(s.prUrl)}">PR #${s.pr}</a> · ${when(s.date)}</div>
+        </figcaption>
+      </figure>`;
+    document.getElementById("shots").innerHTML =
+      card(shots[0], "shot--feature") +
+      `<div class="shots__minis">${shots.slice(1).map((x) => card(x, "shot--mini")).join("")}</div>`;
+  })
+  .catch(() => { /* no manifest yet — leave the section empty */ });
+</script>
+</body>
+</html>

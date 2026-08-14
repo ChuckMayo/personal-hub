@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+
+# Large media never rides the repo. Cloudflare Pages refuses any asset over
+# 25 MiB, so a committed recording or build would break the deploy outright.
+# Upload these through the Files page instead — they belong in R2.
+site/video/
+*.mp4
+*.mov
+*.zip
+!site/img/**
+
+# local `wrangler pages dev` state (simulated R2 lives here)
+.wrangler/
+
+# local editor / agent scratch
+.claude/launch.json

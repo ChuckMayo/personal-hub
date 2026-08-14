@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap guide">
+
+<header class="site" data-hub-shell></header>
+<p class="meta"><strong>This page is an example.</strong> It ships with team-hub so a fresh deploy is not full of blank pages — replace it with how <em>your</em> team actually works.</p>
+<nav class="jumps">
+  <a href="#s-shape">The shape</a>
+  <a href="#s-gate">One gate</a>
+  <a href="#s-flow">Ticket flow</a>
+  <a href="#s-proof">Proof</a>
+  <a href="#s-rules">Rules</a>
+  <a href="#s-writing">Writing this page</a>
+</nav>
+
+<h1>How we work with agents</h1>
+<p class="lead">Agents are teammates, not magic: they go through the same doors we do, and every change — human or agent — faces the same gates. This page is the map. The depth belongs in your repo, next to the code it describes.</p>
+
+<div class="callout callout--amber"><strong>Replace this page.</strong> Everything below is a plausible default, not advice about your codebase. The parts worth keeping are the <em>shapes</em> — one gate, a ticket lifecycle, a proof convention — not the specifics.</div>
+
+<h2 id="s-shape">The shape of a change</h2>
+<p>Whatever the tool, useful agent work tends to have the same spine. Naming it out loud is most of the value of a page like this.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3>What the agent decides</h3>
+    <p>How to implement it. Which files to touch. What to name things. Where the seams go. You will get better results arguing about the acceptance line than about the diff.</p>
+  </div>
+  <div class="card">
+    <h3>What you decide</h3>
+    <p>Whether the ticket is worth doing, whether the acceptance line is honest, and whether the proof convinces you. Those three do not delegate well.</p>
+  </div>
+</div>
+
+<h2 id="s-gate">One gate, not a checklist</h2>
+<p>The single highest-leverage thing you can give an agent is <strong>one command that says yes or no</strong>. Not a wiki page of steps — one command, exit code 0 or not.</p>
+
+<pre class="term">./check          <span class="c"># or: make check, npm test, cargo test, ./gradlew check</span></pre>
+
+<p>It matters that it is one command because:</p>
+<ul class="steps">
+  <li><strong>An agent can run it.</strong> A checklist in a doc is something an agent claims to have followed. A command is something it either passed or did not.</li>
+  <li><strong>It is the same gate for everyone.</strong> If CI runs something the local command does not, the local command is a lie and people stop trusting it.</li>
+  <li><strong>It names what it proved.</strong> Have it print the commit it checked. "Tests pass" is a claim about a moment, and the moment moves.</li>
+</ul>
+
+<div class="callout"><strong>Green means proven, not finished.</strong> A gate says the change did not break what you already knew to check. Whether it did the thing the ticket asked is a question for the proof below.</div>
+
+<h2 id="s-flow">The board is the interface</h2>
+<p>If the dashboard's agent queue is going to work, tickets have to carry enough to act on. The convention this hub ships with is one line:</p>
+
+<pre class="term">Done = the save file survives a restart and reloads to the same state</pre>
+
+<p>A ticket with a <code>Done =</code> line is an agent-ready spec, and <code>scripts/fetch-data.mjs</code> filters the queue on exactly that. Tickets without one simply do not appear — which is what gives writing the line a point.</p>
+
+<ol class="steps">
+  <li><strong>To Do</strong> — has a title. May or may not have an acceptance line.</li>
+  <li><strong>Agent-ready</strong> — has <code>Done =</code>. Shows up in the queue on the Dashboard.</li>
+  <li><strong>In Progress</strong> — set when work <em>starts</em>, not when it finishes. A board that only updates at the end is a board nobody trusts mid-week.</li>
+  <li><strong>In Review</strong> — a PR exists and its link is on the ticket.</li>
+  <li><strong>Done</strong> — merged.</li>
+</ol>
+
+<p>The board stays truthful as a <strong>byproduct of the work</strong> rather than as a separate chore. That only holds if the agent updates it as part of the same session — which is why the prompt templates in <code>hub.config.js</code> say so explicitly.</p>
+
+<h2 id="s-proof">Proof beats description</h2>
+<p>The failure mode of agent work is a confident summary of something that did not happen. The fix is cheap: make the PR carry evidence a human can check in ten seconds.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3>Mechanical proof</h3>
+    <p>The gate output, pasted. A test that was red and is now green. A number that moved. Anything reproducible by someone who does not trust you.</p>
+  </div>
+  <div class="card">
+    <h3>Visible proof</h3>
+    <p>A screenshot or a short capture in the PR body — before and after where it makes sense. <code>scripts/sync-proof-shots.sh</code> mirrors these onto the hub, so they become the Dashboard's screenshot strip for free.</p>
+  </div>
+</div>
+
+<h2 id="s-rules">Rules of the road</h2>
+<ul class="steps">
+  <li><strong>Brief the repo, not the session.</strong> An <code>AGENTS.md</code> at the root loads automatically for most agents. Anything you find yourself re-explaining belongs there.</li>
+  <li><strong>Quote every path with a space in it.</strong> This costs one character and saves an hour roughly once a month.</li>
+  <li><strong>One ticket, one branch, one PR.</strong> A branch that grows a second purpose stops being reviewable.</li>
+  <li><strong>Read the diff.</strong> Not the summary of the diff. This is the whole job now.</li>
+  <li><strong>If the gate is wrong, fix the gate.</strong> Working around a false failure teaches everyone that red is negotiable.</li>
+</ul>
+
+<h2 id="s-writing">Writing your version of this page</h2>
+<p>The useful version of this page is short, opinionated, and specific to things a newcomer would otherwise get wrong. Some prompts:</p>
+<ul class="steps">
+  <li>What is the one command that proves a change is safe?</li>
+  <li>What does an agent need to know that is not obvious from reading the code?</li>
+  <li>What has actually gone wrong twice? That is a rule, not a footnote.</li>
+  <li>Where does the deep documentation live, so this page can stay a map rather than a fork of it?</li>
+</ul>
+
+<div class="callout callout--water"><strong>Keep it a map.</strong> The moment this page starts duplicating documentation that lives in the repo, it starts going stale — and a stale guide is worse than no guide, because people believe it.</div>
+
+<footer class="site" data-hub-shell></footer>
+
+</div>
+</body>
+</html>

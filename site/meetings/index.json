@@ -1,0 +1,9 @@
+{
+  "note": "Newest first — meetings.html renders the first entry on load. Each entry's file is a meeting JSON in this folder.",
+  "meetings": [
+    {
+      "label": "15 Jan 2026 (example)",
+      "file": "meetings/2026-01-15.json"
+    }
+  ]
+}

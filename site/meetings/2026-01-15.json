@@ -1,0 +1,97 @@
+{
+  "id": "2026-01-15",
+  "title": "Weekly sync — 15 Jan 2026",
+  "blurb": "EXAMPLE MEETING. Entirely fictional, shipped with team-hub so the Meetings page renders on a fresh clone. Delete it and publish a real one.",
+  "date": "2026-01-15",
+  "durationSec": 2740,
+  "attendees": ["Ada", "Grace", "Alan", "Katherine"],
+  "absent": ["Edsger — on leave"],
+  "transcript": "meetings/2026-01-15.transcript.json",
+  "provenance": {
+    "model": "Whisper large-v3 (faster-whisper, CUDA float16)",
+    "transcribedAt": "2026-01-15",
+    "speakerLabels": false,
+    "note": "This meeting never happened. Every name, decision and quote below is invented to demonstrate the page. Replace the whole folder with your own meetings.",
+    "redacted": true
+  },
+  "cautions": [
+    "This is example content shipped with team-hub, not a record of anything.",
+    "The transcript shows a redaction marker so you can see how a withheld stretch renders — there is nothing behind it."
+  ],
+  "summary": {
+    "headline": "Import pipeline gets a hard size cap, the flaky checkout test is quarantined rather than retried, and next week is a two-machine end-to-end run.",
+    "paragraphs": [
+      "Most of the hour went to the import pipeline. Large files have been timing out somewhere past the eight-minute mark, and the temptation was to raise the timeout. The group went the other way: a hard cap on input size, a clear error naming the limit, and a documented path for the handful of genuinely large imports. The reasoning was that a timeout is a symptom you can keep raising forever, while a cap is a decision you make once and can explain to a customer.",
+      "The flaky checkout test came up again. It has been retried three times in CI for a month, which means it has effectively been off for a month while still costing everyone the wait. It gets quarantined with a linked ticket and an owner, on the principle that a test nobody trusts is worse than a test nobody has.",
+      "Next week's priority is a real two-machine end-to-end run rather than another round of local verification. Everything so far has passed on one developer's box, which is the configuration least likely to catch the bugs that matter."
+    ]
+  },
+  "topics": [
+    { "start": 60, "title": "Import pipeline timeouts", "summary": "Where the eight-minute wall actually comes from, and why raising the timeout keeps not working." },
+    { "start": 940, "title": "A cap instead of a retry", "summary": "Choosing a documented limit over an ever-growing timeout, and what the error message should say." },
+    { "start": 1580, "title": "The flaky checkout test", "summary": "A month of retries means a month of no coverage. Quarantine, assign, and stop paying the wait." },
+    { "start": 2180, "title": "Next week: two machines", "summary": "Local passes have stopped being informative. The next milestone is an end-to-end run across two hosts." }
+  ],
+  "decisions": [
+    { "at": 1120, "text": "Hard-cap import input at 512 MB. Reject above it with an error that names the limit and links the docs — no silent truncation, no raised timeout." },
+    { "at": 1655, "text": "Quarantine the checkout test rather than retrying it. It gets a ticket and a named owner, and it does not gate merges until it is fixed." },
+    { "at": 2240, "text": "Next milestone is a two-machine end-to-end run. A local pass no longer counts as evidence for this path." }
+  ],
+  "actionItems": [
+    {
+      "who": "Ada",
+      "what": "Add the 512 MB import cap and the error message that names it",
+      "at": 1180,
+      "note": "Error copy matters more than the check — it is the only thing a user sees.",
+      "actions": [
+        { "kind": "link", "label": "Import epic · ATL-13", "href": "https://northwind-labs.atlassian.net/browse/ATL-13" },
+        { "kind": "agent", "label": "Draft the cap", "prompt": "ATL-13 — cap import input at 512 MB.\n\nAcceptance: an import above 512 MB is rejected before any work starts, with an error naming the limit and linking the docs.\n\nRead AGENTS.md first. Write the failing test before the implementation." }
+      ]
+    },
+    {
+      "who": "Grace",
+      "what": "Quarantine the checkout test, open a ticket, put a name on it",
+      "at": 1690,
+      "actions": [
+        { "kind": "copy", "label": "Copy for the board" }
+      ]
+    },
+    {
+      "who": "Alan",
+      "what": "Post the two-machine build so the end-to-end run has something to run",
+      "at": 2260,
+      "actions": [
+        { "kind": "page", "label": "Upload the build", "href": "files.html#s-builds" }
+      ]
+    },
+    {
+      "who": "Katherine",
+      "what": "Write the acceptance line on the three unspecced tickets so they reach the agent queue",
+      "at": 2410,
+      "note": "Anything without a Done = line is invisible to the dashboard queue, by design.",
+      "actions": [
+        { "kind": "page", "label": "See the queue", "href": "index.html#s-start" }
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "title": "Why a cap beats a longer timeout",
+      "audience": "public",
+      "start": 1085,
+      "end": 1150,
+      "quote": "A timeout is a number you keep raising. A cap is a decision you make once and can explain to somebody.",
+      "why": "The clearest statement of the reasoning, and it generalises well beyond this pipeline."
+    },
+    {
+      "title": "A retried test is a disabled test",
+      "audience": "public",
+      "start": 1620,
+      "end": 1668,
+      "quote": "We've retried it three times a run for a month. That's not a flaky test any more, that's a test we turned off and kept paying for.",
+      "why": "Worth sending to anyone about to add a retry."
+    }
+  ],
+  "downloads": [],
+  "recordingPolicy": "No recording is published for this example meeting — only the clips above. That is the default the hub encourages: an hour of conversation carries things nobody meant to broadcast, and the clips are the part with an audience."
+}

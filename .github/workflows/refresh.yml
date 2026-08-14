@@ -1,0 +1,61 @@
+name: Refresh data & deploy
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # every 6 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh-deploy:
+    runs-on: ubuntu-latest
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch fresh data
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        run: node scripts/fetch-data.mjs
+
+      - name: Commit refreshed data (scheduled runs only)
+        if: github.event_name != 'push'
+        run: |
+          if ! git diff --quiet site/data.json; then
+            git config user.name "team-hub-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add site/data.json
+            git commit -m "data: scheduled refresh"
+            git push
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        if: env.CF_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # No directory or --project-name here: both come from wrangler.toml,
+          # and passing the directory as well is an error once
+          # pages_build_output_dir is set.
+          command: pages deploy
+
+      - name: Deploy skipped (Cloudflare secrets not set)
+        if: env.CF_TOKEN == ''
+        run: echo "CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set — data refreshed, deploy skipped. See README."

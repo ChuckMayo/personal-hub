@@ -1,0 +1,23 @@
+# Cloudflare Pages response headers. Lives in the deploy output directory
+# (site/) and is consumed by Pages rather than served as an asset.
+#
+# Why this file exists: there is no build step here, so no content hashing.
+# hub.js and style.css used to be referenced as `?v=N` on all six pages, with a
+# note telling whoever edited them to bump N. Someone eventually didn't, and a
+# cached hub.js silently disabled every agent button on the site — the page
+# looked fine, the buttons just did nothing.
+#
+# `no-cache` does not mean "don't cache". It means "cache it, but revalidate
+# before reuse". The browser keeps the file and sends its ETag; Pages answers
+# 304 with no body when it hasn't changed. So the cost is one conditional
+# request per asset per page load, and the reward is that a stale copy is not
+# reachable — no version to bump, nothing to forget.
+
+/hub.js
+  Cache-Control: no-cache
+
+/hub.config.js
+  Cache-Control: no-cache
+
+/style.css
+  Cache-Control: no-cache
