@@ -225,6 +225,57 @@ Withhold stretches with a `redactions` entry and a marked segment, so a gap is
 visible where it happens rather than a silent jump in the timestamps. Transcripts
 are small and worth versioning. Video never is — `.gitignore` keeps it out.
 
+## Staying up to date
+
+Your hub is a **fork**, not a copy. Adding this repo as `upstream` is what keeps
+you on the improvements without re-doing your setup:
+
+```bash
+git remote add upstream https://github.com/vibery-llc/team-hub
+git fetch upstream
+git merge upstream/main
+```
+
+This works because your fork is the *same tree shape* as upstream, differing
+only in files upstream does not compete for:
+
+| yours | upstream's |
+|---|---|
+| `site/hub.config.js` | ships an example version |
+| `site/brand/` | ships a placeholder mark |
+| `site/data.json`, `site/meetings/`, `site/img/proof/` | ships example data |
+| `wrangler.toml` | ships placeholder names |
+| `guide.html`, `resources.html` | ships example prose |
+
+Everything else — `hub.js`, `style.css`, `index.html`, `meetings.html`,
+`files.html`, `setup.html`, `functions/`, `scripts/` — should be **byte-identical
+to upstream**, and those merges fast-forward cleanly.
+
+### The conflict is the feature
+
+If a merge conflicts in a product file, that is the point. It means someone
+edited product code locally instead of putting the change in config, and you are
+finding out now rather than discovering six months of accumulated drift when you
+finally try to pull. Resolve it by moving the customisation into
+`hub.config.js` — and if it cannot go there, that is a missing config key worth
+[opening an issue](https://github.com/vibery-llc/team-hub/issues) about.
+
+Conflicts in the tenant files above are ordinary and boring. `git checkout
+--ours` is usually right for `guide.html` and `resources.html`; for
+`hub.config.js`, read the upstream side, since a new key means a new feature you
+can now switch on.
+
+To see how far you have drifted before merging:
+
+```bash
+git fetch upstream
+git diff upstream/main --stat -- site/hub.js site/style.css site/index.html \
+  site/meetings.html site/files.html functions/ scripts/
+```
+
+Empty output means zero drift. Anything listed is a local edit to product code
+that will conflict eventually.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The no-build-step and no-tenant-strings
