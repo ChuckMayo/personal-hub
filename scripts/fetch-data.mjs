@@ -221,8 +221,19 @@ async function fetchJira() {
 }
 
 let ok = true;
+/* Did any source actually answer? A run where everything was skipped or failed
+   has nothing new to say. Stamping generatedAt anyway would make data.json
+   differ on every single run, which the workflow reads as "the data changed"
+   and commits — a timestamp-only commit every six hours, forever, on any hub
+   whose credentials are missing or have lapsed.
+
+   It also makes the field honest: the page renders it as "data refreshed
+   <time>", and that should be when the data was last refreshed, not when the
+   script last ran and got nowhere. */
+let refreshed = false;
+
 if (process.env.GH_TOKEN) {
-  try { data.github = await fetchGithub(); console.log("github: refreshed"); }
+  try { data.github = await fetchGithub(); refreshed = true; console.log("github: refreshed"); }
   catch (e) { ok = false; console.error("github: FAILED —", e.message, "(keeping previous data)"); }
 } else console.warn("github: GH_TOKEN not set, keeping previous data");
 
@@ -231,11 +242,12 @@ if (TRACKER.kind && TRACKER.kind !== "jira") {
 } else if (!JIRA_BASE || !PROJECT_KEY) {
   console.warn("tracker: hub.config.js has no tracker.baseUrl/projectKey, keeping previous data");
 } else if (process.env.JIRA_EMAIL && process.env.JIRA_TOKEN) {
-  try { data.jira = await fetchJira(); console.log("jira: refreshed"); }
+  try { data.jira = await fetchJira(); refreshed = true; console.log("jira: refreshed"); }
   catch (e) { ok = false; console.error("jira: FAILED —", e.message, "(keeping previous data)"); }
 } else console.warn("jira: JIRA_EMAIL/JIRA_TOKEN not set, keeping previous data");
 
-data.generatedAt = new Date().toISOString();
+if (refreshed) data.generatedAt = new Date().toISOString();
+else console.warn("nothing refreshed — leaving generatedAt alone so the file is unchanged");
 writeFileSync(OUT, JSON.stringify(data, null, 2) + "\n");
 console.log(`wrote ${OUT}`);
 process.exit(ok ? 0 : 0); // stale-but-rendering beats a dead refresh; failures are logged above
