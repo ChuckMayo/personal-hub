@@ -163,6 +163,7 @@ globalThis.HUB_CONFIG = {
     { label: "Pull requests", href: "https://github.com/northwind-labs/atlas/pulls" },
     { label: "Jira · ATL board", href: "https://northwind-labs.atlassian.net/jira/software/projects/ATL/boards/1" },
     { label: "AGENTS.md", href: "https://github.com/northwind-labs/atlas/blob/main/AGENTS.md" },
+    { label: "Zo Computer", href: "https://zo-computer.cello.so/7LkJkHv7gds" },
     { label: "This site's source", href: "https://github.com/vibery-llc/team-hub" },
   ],
 
