@@ -21,15 +21,15 @@
 
 globalThis.HUB_CONFIG = {
   /* The small line above the site title in the header. */
-  org: "Northwind Labs",
+  org: "Charlie Helman",
 
   /* The site title, in the header and in the browser tab. */
-  siteName: "Atlas — Team Hub",
+  siteName: "Personal Command — Hub",
 
   brand: {
     /* Alt text for the mark. The image files themselves are site/brand/mark*.png
        — the paths are a product convention, so only the files are yours. */
-    alt: "Northwind Labs",
+    alt: "Charlie Helman",
     /* Intrinsic pixel size of brand/mark.png. CSS drives the displayed height;
        these are here so the browser reserves the right box before it loads. */
     markWidth: 512,
@@ -37,7 +37,7 @@ globalThis.HUB_CONFIG = {
   },
 
   /* Shown in the footer of any page that does not name its own. */
-  footer: "One set of gates for everyone · read the repo · prove the change",
+  footer: "One set of gates for me · read the ledger · move one closure",
 
   /* The nav, in order. `href` doubles as the page's identity: the link matching
      the current URL is marked active, and that entry's `title` and `footer`
@@ -49,25 +49,25 @@ globalThis.HUB_CONFIG = {
     {
       href: "index.html",
       label: "Dashboard",
-      title: "Atlas — Team Hub",
+      title: "Personal Command — Hub",
       footer: "Auto-refreshes on a schedule via GitHub Actions",
     },
     {
       href: "meetings.html",
       label: "Meetings",
-      title: "Meetings — Atlas",
-      footer: "Transcribed locally · full recordings are not published, only the clips the team selected",
+      title: "Meetings — Personal Command",
+      footer: "Transcribed locally · full recordings are not published, only the clips selected",
     },
     {
       href: "files.html",
       label: "Files & builds",
-      title: "Files & builds — Atlas",
+      title: "Files & builds — Personal Command",
       footer: "Files live in Cloudflare R2 · gated by Access",
     },
     {
       href: "activity.html",
       label: "Activity",
-      title: "Team activity — Atlas",
+      title: "Activity — Personal Command",
       footer: "Concise pointers to the real project records · accountable to a human owner",
       feature: "activityLog",
     },
@@ -80,17 +80,15 @@ globalThis.HUB_CONFIG = {
      launcher opens sessions against it, and fetch-data.mjs reads its PRs and
      commits. `gitUrl` is what Codex matches a local clone against. */
   repo: {
-    slug: "northwind-labs/atlas",
-    url: "https://github.com/northwind-labs/atlas",
-    gitUrl: "https://github.com/northwind-labs/atlas.git",
+    slug: "ChuckMayo/executive-system",
+    url: "https://github.com/ChuckMayo/executive-system",
+    gitUrl: "https://github.com/ChuckMayo/executive-system.git",
   },
 
-  /* How the project is named mid-sentence on the Setup page ("open your Atlas
-     folder"), and what the checkout is usually called on disk. Anywhere a page
-     needs one of these it uses <em data-hub-var="projectName"></em>, which is
-     what keeps Setup a product page rather than a per-team copy. */
-  projectName: "Atlas",
-  repoDirName: "atlas",
+  /* How the project is named mid-sentence on the Setup page ("open your
+     executive-system folder"), and what the checkout is usually called on disk. */
+  projectName: "executive-system",
+  repoDirName: "executive-system",
 
   /* Optional shared activity log. It is absent from navigation until a human
      explicitly enables it AND names the human who owns what gets published.
@@ -138,10 +136,6 @@ globalThis.HUB_CONFIG = {
                    which is the right answer for most tools.
        launch      a second URL opened after copying, to bring an app forward
        copies      true if the note already tells the user it copies
-
-     Example — a tool with no documented deep link:
-
-       { id: "acme", label: "Acme", note: "copies the prompt — paste it into Acme" }
   */
   launchers: [],
 
@@ -151,15 +145,7 @@ globalThis.HUB_CONFIG = {
   /* The issue tracker, or `null` to run on GitHub alone — see the README under
      "Running without an issue tracker". `kind: "jira"` is the only adapter
      fetch-data.mjs implements today; the rest is where to reach your board. */
-  tracker: {
-    kind: "jira",
-    baseUrl: "https://northwind-labs.atlassian.net",
-    projectKey: "ATL",
-    /* How the board is named in the UI, e.g. under the "tickets done" KPI. */
-    label: "ATL board",
-    boardUrl: "https://northwind-labs.atlassian.net/jira/software/projects/ATL/boards/1",
-    timelineUrl: "https://northwind-labs.atlassian.net/jira/software/projects/ATL/boards/1/timeline",
-  },
+  tracker: null,
 
   /* The line under the phase-plan heading on the dashboard. */
   phasesBlurb: "The shared phasing for the current milestone, checked against what is actually in the repo.",
@@ -167,23 +153,16 @@ globalThis.HUB_CONFIG = {
   /* The phase plan on the dashboard: which ticket stands for each phase.
      fetch-data.mjs looks each key up and attaches its live status, so the
      statuses here are never hand-maintained. An empty list hides the section. */
-  phases: [
-    { phase: "P0", key: "ATL-11", name: "Foundation", desc: "The thing everything else sits on" },
-    { phase: "P1", key: "ATL-12", name: "Core loop", desc: "The path a user actually takes" },
-    { phase: "P2", key: "ATL-13", name: "State", desc: "Persist it, sync it, restore it" },
-    { phase: "P3", key: "ATL-14", name: "Risk spike", desc: "The part nobody is sure about yet" },
-    { phase: "P4", key: "ATL-15", name: "End to end", desc: "Two machines, one flow" },
-    { phase: "P5", key: "ATL-16", name: "QA + hardening", desc: "Before the slice ships" },
-  ],
+  phases: [],
 
   /* The "Links" fold on the dashboard — wherever your team actually goes. */
   links: [
-    { label: "GitHub · atlas", href: "https://github.com/northwind-labs/atlas" },
-    { label: "Pull requests", href: "https://github.com/northwind-labs/atlas/pulls" },
-    { label: "Jira · ATL board", href: "https://northwind-labs.atlassian.net/jira/software/projects/ATL/boards/1" },
-    { label: "AGENTS.md", href: "https://github.com/northwind-labs/atlas/blob/main/AGENTS.md" },
-    { label: "Zo Computer", href: "https://zo-computer.cello.so/7LkJkHv7gds" },
-    { label: "This site's source", href: "https://github.com/vibery-llc/team-hub" },
+    { label: "GitHub · executive-system", href: "https://github.com/ChuckMayo/executive-system" },
+    { label: "Vibery", href: "https://github.com/vibery-llc/vibery" },
+    { label: "Session Zero", href: "https://github.com/vibery-llc/session-zero" },
+    { label: "Kingdom Forge", href: "https://github.com/Kingdom-Forge/before-the-flood" },
+    { label: "Zo Computer", href: "https://charliehelman.zo.space/" },
+    { label: "This site's source", href: "https://github.com/ChuckMayo/personal-hub" },
   ],
 
   /* The prompt buttons on each agent-ready ticket. These are the most
