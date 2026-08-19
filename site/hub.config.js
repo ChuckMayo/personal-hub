@@ -160,7 +160,7 @@ globalThis.HUB_CONFIG = {
     { label: "GitHub · executive-system", href: "https://github.com/ChuckMayo/executive-system" },
     { label: "Vibery", href: "https://github.com/vibery-llc/vibery" },
     { label: "Session Zero", href: "https://github.com/vibery-llc/session-zero" },
-    { label: "Kingdom Forge", href: "https://github.com/Kingdom-Forge/before-the-flood" },
+    { label: "Kingdom Forge hub", href: "https://github.com/Kingdom-Forge/kf-hub" },
     { label: "Zo Computer", href: "https://charliehelman.zo.space/" },
     { label: "This site's source", href: "https://github.com/ChuckMayo/personal-hub" },
   ],
