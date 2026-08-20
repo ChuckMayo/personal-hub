@@ -5,5 +5,12 @@
     "mergedPrs": 3,
     "commitCount": 37,
     "ticketsDone": 4
+  },
+  {
+    "date": "2026-08-20",
+    "openPrs": 0,
+    "mergedPrs": 0,
+    "commitCount": 100,
+    "ticketsDone": 4
   }
 ]
