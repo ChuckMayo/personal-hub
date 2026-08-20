@@ -65,6 +65,12 @@ globalThis.HUB_CONFIG = {
       footer: "Files live in Cloudflare R2 · gated by Access",
     },
     {
+      href: "audio.html",
+      label: "Audio",
+      title: "Audio — Personal Command",
+      footer: "Sound files across all GitHub repos · searchable catalog",
+    },
+    {
       href: "activity.html",
       label: "Activity",
       title: "Activity — Personal Command",

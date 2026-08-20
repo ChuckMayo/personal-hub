@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio · Personal Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/mark-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/mark-64.png">
+<link rel="stylesheet" href="style.css">
+<script src="hub.config.js"></script>
+<script defer src="hub.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site" data-hub-shell></header>
+
+<p class="meta" id="generated">loading…</p>
+
+<div class="audio-stats" id="stats"></div>
+<input type="search" class="audio-search" id="search" placeholder="Search audio…" autofocus>
+<ul class="audio-list" id="list"></ul>
+
+</div>
+
+<script>
+let files = [];
+let currentAudio = null;
+
+async function load() {
+  try {
+    const res = await fetch("audio.json");
+    const data = await res.json();
+    files = data.files || [];
+    document.getElementById("generated").textContent =
+      data.generatedAt
+        ? "Indexed " + new Date(data.generatedAt).toLocaleString()
+        : "No index yet — run fetch-audio.mjs first";
+    renderStats(data.stats);
+    renderList(files);
+  } catch (e) {
+    document.getElementById("list").innerHTML =
+      '<li class="audio-empty">Could not load audio catalog.</li>';
+  }
+}
+
+function renderStats(stats) {
+  if (!stats) return;
+  const exts = Object.entries(stats.byExt || {}).sort((a, b) => b[1] - a[1]);
+  document.getElementById("stats").innerHTML =
+    '<span>' + (stats.total || 0) + ' files</span>' +
+    (exts.length ? '<span>' + exts.map(([e, n]) => e.toUpperCase() + ' · ' + n).join('  ') + '</span>' : '');
+}
+
+function renderList(items) {
+  const list = document.getElementById("list");
+  if (!items.length) {
+    list.innerHTML = '<li class="audio-empty">No audio files found yet. Run the scanner to populate the catalog.</li>';
+    return;
+  }
+  list.innerHTML = items.map((f, i) =>
+    '<li class="audio-item">' +
+      '<button class="audio-play" data-index="' + i + '" title="Play / pause">▶</button>' +
+      '<div class="audio-meta">' +
+        '<span class="audio-name">' + esc(f.name || f.path) + '</span>' +
+        '<div style="display:flex;gap:8px;align-items:center;margin-top:2px">' +
+          '<span class="audio-ext">' + esc(f.ext || '') + '</span>' +
+          '<span class="audio-repo">' + esc(f.repo || '') + '</span>' +
+          '<span class="audio-path">' + esc(f.path || '') + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</li>'
+  ).join("");
+  list.querySelectorAll(".audio-play").forEach(btn => {
+    btn.addEventListener("click", () => togglePlay(parseInt(btn.dataset.index), btn));
+  });
+}
+
+function esc(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+function togglePlay(index, btn) {
+  const file = files[index];
+  if (!file || !file.url) return;
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  document.querySelectorAll(".audio-play.playing").forEach(b => b.classList.remove("playing"));
+  if (btn.classList.contains("playing")) { btn.classList.remove("playing"); return; }
+  const audio = new Audio(file.url);
+  audio.onended = () => { btn.classList.remove("playing"); currentAudio = null; };
+  audio.onerror = () => { btn.classList.remove("playing"); btn.textContent = "✕"; currentAudio = null; };
+  audio.play().catch(() => { btn.classList.remove("playing"); });
+  btn.classList.add("playing");
+  currentAudio = audio;
+}
+
+document.getElementById("search").addEventListener("input", function () {
+  const q = this.value.toLowerCase();
+  renderList(q ? files.filter(f =>
+    (f.name || "").toLowerCase().includes(q) ||
+    (f.repo || "").toLowerCase().includes(q) ||
+    (f.ext  || "").toLowerCase().includes(q) ||
+    (f.path || "").toLowerCase().includes(q)
+  ) : files);
+});
+
+load();
+</script>
+
+<footer class="site" data-hub-shell></footer>
+</body>
+</html>

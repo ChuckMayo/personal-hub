@@ -34,6 +34,11 @@ jobs:
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
         run: node scripts/fetch-data.mjs
 
+      - name: Fetch audio catalog
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: node scripts/fetch-audio.mjs
+
       # Reuses GH_PAT (same secret as "Fetch fresh data" above) — its existing
       # read-only Contents + Pull requests scope on the source repo is exactly
       # what mirroring PR-body screenshots needs, nothing extra to grant.
@@ -57,7 +62,7 @@ jobs:
       - name: Commit refreshed data (scheduled runs only)
         if: github.event_name != 'push'
         run: |
-          git add site/data.json site/img/proof
+          git add site/data.json site/audio.json site/img/proof
           [ -f site/history.json ] && git add site/history.json
           if ! git diff --cached --quiet; then
             git config user.name "team-hub-bot"
